@@ -231,7 +231,8 @@ binary-common:
 
 # Build architecture independant packages using the common target.
 binary-indep: build install
-	 $(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+	# Disable -doc package building.
+	#$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
 # Build architecture dependant packages using the common target.
 binary-arch: build install $(EXTRA_INSTALL)

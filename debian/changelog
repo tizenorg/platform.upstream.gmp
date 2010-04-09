@@ -1,3 +1,9 @@
+gmp (2:4.3.2+dfsg-1slp2+s1) unstable; urgency=low
+
+  * Disable -doc package building
+
+ -- Karol Lewandowski <k.lewandowsk@samsung.com>  Fri, 09 Apr 2010 16:17:18 +0200
+
 gmp (2:4.3.2+dfsg-1) unstable; urgency=low
 
   * New upstream version.

@@ -1,5 +1,6 @@
 #!/usr/bin/make -f
 
+DISTRIBUTION := SLP
 ORIG_SRC_VERSION = 4.3.2
 
 include /usr/share/quilt/quilt.make
@@ -20,10 +21,12 @@ export DEB_HOST_GNU_TYPE  := $(subst i386,i486, $(shell dpkg-architecture -qDEB_
 export DEB_BUILD_GNU_TYPE := $(subst i386,i486, $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE))
 
 MAKE_CHECK = : disabled make check
+ifneq ($(DISTRIBUTION),SLP)
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
   ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
     MAKE_CHECK = $(MAKE) check
   endif
+endif
 endif
 
 export CFLAGS = -Wall -g -D_REENTRANT
@@ -231,8 +234,9 @@ binary-common:
 
 # Build architecture independant packages using the common target.
 binary-indep: build install
-	# Disable -doc package building.
-	#$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+ifneq ($(DISTRIBUTION),SLP)
+	 $(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+endif
 
 # Build architecture dependant packages using the common target.
 binary-arch: build install $(EXTRA_INSTALL)

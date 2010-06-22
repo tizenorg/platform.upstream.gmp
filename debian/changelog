@@ -1,3 +1,9 @@
+gmp (2:4.3.2+dfsg-1slp2+s2) unstable; urgency=low
+
+  * Disable tests when compiling for SLP
+
+ -- Rafal Krypa <r.krypa@samsung.com>  Tue, 22 Jun 2010 16:52:30 +0200
+
 gmp (2:4.3.2+dfsg-1slp2+s1) unstable; urgency=low
 
   * Disable -doc package building

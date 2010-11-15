@@ -152,3 +152,17 @@ Architecture: all
 Replaces: libgmp3 (<< 3.1.1-8)
 Description: Multiprecision arithmetic library example code
  This package provides example code illustrating the use of GMP.
+
+Package: libgmp-0
+Section: libs
+Priority: extra
+Architecture: any
+Depends: libgmp3c2 (= ${binary:Version}), libgmpxx4ldbl (= ${binary:Version})
+Description: dummy package provided for scratchbox1-compatibility
+
+Package: libgmp-dev
+Section: libdevel
+Priority: extra
+Architecture: any
+Depends: libgmp3-dev (= ${binary:Version}), libgmp-0 (= ${binary:Version})
+Description: dummy package provided for scratchbox1-compatibility

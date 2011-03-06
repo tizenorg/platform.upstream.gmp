@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-ORIG_SRC_VERSION = 4.3.2
+ORIG_SRC_VERSION = 5.0.1
 
 include /usr/share/quilt/quilt.make
 
@@ -26,13 +26,17 @@ ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
   endif
 endif
 
-export CFLAGS = -Wall -g -D_REENTRANT
+export CFLAGS = -Wall -g 
 export LDFLAGS = -Wl,-Bsymbolic-functions
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
   CFLAGS += -O0
 else
-  CFLAGS += -O3
+  ifneq (,$(findstring $(DEB_HOST_ARCH), ia64))
+    CFLAGS += -O2
+  else
+    CFLAGS += -O3
+  endif
 endif
 
 lib32dir = usr/lib32
@@ -163,46 +167,46 @@ install-prep:
 install: build-stamp install-prep
 	$(MAKE) DESTDIR=`pwd`/debian/tmp -C build install
 
-	dh_install -plibgmp3c2 usr/lib/libgmp.so.*
-	dh_install -plibgmp3c2 usr/lib/libmp.so.*
+	dh_install -plibgmp10 usr/lib/libgmp.so.*
+	dh_install -plibmp3 usr/lib/libmp.so.*
 
 	dh_install -plibgmpxx4ldbl usr/lib/libgmpxx.so.*
 
-	dh_install -plibgmp3-dev usr/lib/lib*.so
-	dh_install -plibgmp3-dev usr/lib/lib*.a
-	dh_install -plibgmp3-dev usr/lib/lib*.la
-	dh_install -plibgmp3-dev usr/include
-	dh_install -plibgmp3-dev -Xgmp-mparam.h build/gmp*.h usr/include
+	dh_install -plibgmp10-dev usr/lib/lib*.so
+	dh_install -plibgmp10-dev usr/lib/lib*.a
+	dh_install -plibgmp10-dev usr/lib/lib*.la
+	dh_install -plibgmp10-dev usr/include
+	dh_install -plibgmp10-dev -Xgmp-mparam.h build/gmp*.h usr/include
 
 	# Install upstream ChangeLog, AUTHORS, NEWS, and README only in -dev package
-	dh_installchangelogs -plibgmp3-dev
-	dh_installdocs -plibgmp3-dev AUTHORS NEWS README
+	dh_installchangelogs -plibgmp10-dev
+	dh_installdocs -plibgmp10-dev AUTHORS NEWS README
 
 install32: build32-stamp install-prep
 	$(MAKE) DESTDIR=`pwd`/debian/tmp -C build32 install
 
-	dh_install -plib32gmp3 ${lib32dir}/libgmp.so.*
-	dh_install -plib32gmp3 ${lib32dir}/libmp.so.*
+	dh_install -plib32gmp10 ${lib32dir}/libgmp.so.*
+	dh_install -plib32mp3 ${lib32dir}/libmp.so.*
 
 	dh_install -plib32gmpxx4 ${lib32dir}/libgmpxx.so.*
 
-	dh_install -plib32gmp3-dev ${lib32dir}/lib*.so
-	dh_install -plib32gmp3-dev ${lib32dir}/lib*.a
-	dh_install -plib32gmp3-dev ${lib32dir}/lib*.la
-	dh_install -plib32gmp3-dev -Xgmp-mparam.h -Xgmp.h build32/gmp*.h usr/include
+	dh_install -plib32gmp10-dev ${lib32dir}/lib*.so
+	dh_install -plib32gmp10-dev ${lib32dir}/lib*.a
+	dh_install -plib32gmp10-dev ${lib32dir}/lib*.la
+	dh_install -plib32gmp10-dev -Xgmp-mparam.h -Xgmp.h build32/gmp*.h usr/include
 
 install64: build64-stamp install-prep
 	$(MAKE) DESTDIR=`pwd`/debian/tmp -C build64 install
 
-	dh_install -plib64gmp3 ${lib64dir}/libgmp.so.*
-	dh_install -plib64gmp3 ${lib64dir}/libmp.so.*
+	dh_install -plib64gmp10 ${lib64dir}/libgmp.so.*
+	dh_install -plib64mp3 ${lib64dir}/libmp.so.*
 
 	dh_install -plib64gmpxx4 ${lib64dir}/libgmpxx.so.*
 
-	dh_install -plib64gmp3-dev ${lib64dir}/lib*.so
-	dh_install -plib64gmp3-dev ${lib64dir}/lib*.a
-	dh_install -plib64gmp3-dev ${lib64dir}/lib*.la
-	dh_install -plib64gmp3-dev -Xgmp-mparam.h -Xgmp.h build64/gmp*.h usr/include
+	dh_install -plib64gmp10-dev ${lib64dir}/lib*.so
+	dh_install -plib64gmp10-dev ${lib64dir}/lib*.a
+	dh_install -plib64gmp10-dev ${lib64dir}/lib*.la
+	dh_install -plib64gmp10-dev -Xgmp-mparam.h -Xgmp.h build64/gmp*.h usr/include
 
 
 # This single target is used to build all the packages, all at once, or

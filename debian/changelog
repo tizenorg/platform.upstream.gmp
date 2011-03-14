@@ -1,3 +1,87 @@
+gmp (2:5.0.1+dfsg-6) unstable; urgency=low
+
+  * control: libgmp10-dev provides the old libgmp3-dev package.  This is a
+    temporary measure to ease the transition for ghc, which build-depends
+    on itself as well as libgmp3-dev; c.f.
+    http://lists.debian.org/debian-haskell/2011/03/msg00013.html
+
+ -- Steve M. Robbins <smr@debian.org>  Sun, 06 Mar 2011 09:38:56 -0600
+
+gmp (2:5.0.1+dfsg-5) unstable; urgency=low
+
+  * Merge the v5 branch back to trunk.
+
+  * Package libgmp10-dev also provides libgmp-dev so you can build-depend
+    on an unversioned GMP -dev package.
+  
+  * Remove archaic MP compatibility library (libmp3 and 32/64-bit
+    variants).
+  
+  * control: Set Standards-Version to 3.9.1.
+    - rules: don't build with -D_REENTRANT
+
+ -- Steve M. Robbins <smr@debian.org>  Sat, 05 Mar 2011 10:25:02 -0600
+
+gmp (2:5.0.1+dfsg-4) experimental; urgency=low
+
+  * rules: Build with -O2 on ia64, to work around ICE
+    (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=43603).
+
+ -- Steve M. Robbins <smr@debian.org>  Mon, 14 Feb 2011 21:39:01 -0600
+
+gmp (2:5.0.1+dfsg-3) experimental; urgency=low
+
+  [ Sylvestre Ledru ]
+  * Package moved to Debian Science.
+  
+  * gmp.h: Add support for __m68k__ (thanks, Thorsten Glaser).  
+    Closes: #601287.
+  
+  * libgmp3-doc.examples:
+  * libgmp3-doc.README.Debian: Rename to libgmp10-doc.xxx.
+  
+  * libgmp3.prerm: Remove obsolete file.  Was used to remove /usr/doc/xxx
+    symlinks from back at the time of the /usr/doc --> /usr/share/doc
+    transition.
+
+ -- Steve M. Robbins <smr@debian.org>  Sat, 06 Nov 2010 17:55:15 -0500
+
+gmp (2:5.0.1+dfsg-2) experimental; urgency=low
+
+  * control: 
+  * rules: New packages libmp3, lib32mp3, lib64mp3.  Split library mp
+    out from the libgmp package as they have evolved to use different
+    major numbers now.  Make libgmp10-dev conflict & replace libgmp3-dev
+    packages; ditto for 32-bit and 64-bit variants.  Closes: #570225.
+
+ -- Steve M. Robbins <smr@debian.org>  Sun, 28 Feb 2010 03:31:42 -0600
+
+gmp (2:5.0.1+dfsg-1) experimental; urgency=low
+
+  * New upstream release.  Library gmp SOVERSION bumped from 3 to 10.
+  
+  * control: New packages (libgmp10, libgmp10-dev, etc) replace
+    corresponding packages due to SOVERSION change.  Drop some
+    now-obsolete conflicts on libgmp3 and libgmp2 pacakges.
+    Bump Standards-Version to 3.8.4.
+
+ -- Steve M. Robbins <smr@debian.org>  Sun, 07 Feb 2010 11:04:56 -0600
+
+gmp (2:5.0.0+dfsg-1) experimental; urgency=low
+
+  * New upstream release.
+
+ -- Steve M. Robbins <smr@debian.org>  Sat, 09 Jan 2010 19:38:41 -0600
+
+gmp (2:4.3.2+dfsg-2) UNRELEASED; urgency=low
+
+  * Package moved to Debian Science
+
+  [ Steve M. Robbins ]
+  * control: Set Standards-Version to 3.8.3.  Add ${misc:Depends} to each package.
+
+ -- Sylvestre Ledru <sylvestre@debian.org>  Wed, 28 Apr 2010 14:24:45 +0200
+
 gmp (2:4.3.2+dfsg-1slp2+s2) unstable; urgency=low
 
   * Disable tests when compiling for SLP

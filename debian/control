@@ -3,19 +3,17 @@ Homepage: http://gmplib.org/
 Section: libs
 Priority: optional
 Build-Depends: m4, debhelper (>= 7), quilt, gcc-multilib [amd64 kfreebsd-amd64 powerpc ppc64], g++-multilib [amd64 kfreebsd-amd64 powerpc ppc64]
-Maintainer: Debian Scientific Computing Team <pkg-scicomp-devel@lists.alioth.debian.org>
+Maintainer: Debian Science Team <debian-science-maintainers@lists.alioth.debian.org>
 Uploaders: Steve M. Robbins <smr@debian.org>
-Vcs-Browser: http://svn.debian.org/wsvn/pkg-scicomp/gmp/trunk/?rev=0&sc=0
-Vcs-Svn: svn://svn.debian.org/svn/pkg-scicomp/gmp/trunk
-Standards-Version: 3.8.1
+Vcs-Svn: svn://svn.debian.org/svn/debian-science/packages/gmp/trunk/
+Vcs-Browser: http://svn.debian.org/viewsvn/debian-science/packages/gmp/trunk/
+Standards-Version: 3.9.1
 
-Package: libgmp3c2
+Package: libgmp10
 Section: libs
 Priority: optional
 Architecture: any
-Depends: ${shlibs:Depends}
-Conflicts: libgmp3, libgmp2 (<< 2.0.2-10)
-Replaces: libgmp3
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Multiprecision arithmetic library
  GNU MP is a programmer's library for arbitrary precision
  arithmetic (ie, a bignum package).  It can operate on signed
@@ -28,7 +26,7 @@ Package: libgmpxx4ldbl
 Section: libs
 Priority: optional
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: libgmp3, libgmpxx4
 Replaces: libgmp3
 Description: Multiprecision arithmetic library (C++ bindings)
@@ -36,19 +34,20 @@ Description: Multiprecision arithmetic library (C++ bindings)
  arithmetic (ie, a bignum package).  It can operate on signed
  integer, rational, and floating point numeric types.
 
-Package: libgmp3-dev
+Package: libgmp10-dev
 Section: libdevel
 Priority: optional
 Architecture: any
-Depends: libgmp3c2 (= ${binary:Version}), libgmpxx4ldbl (= ${binary:Version})
-Replaces: libgmp2-dev
-Conflicts: libgmp2-dev
+Depends: libgmp10 (= ${binary:Version}), libgmpxx4ldbl (= ${binary:Version}), ${misc:Depends}
+Provides: libgmp-dev, libgmp3-dev
+Conflicts: libgmp3-dev
+Replaces: libgmp3-dev
 Recommends: libstdc++-dev
-Suggests: libgmp3-doc, libmpfr-dev
+Suggests: libgmp10-doc, libmpfr-dev
 Description: Multiprecision arithmetic library developers tools
  This development package provides the header files and the symbolic
  links to allow compilation and linking of programs that use the libraries
- provided in the libgmp3 package.
+ provided in the libgmp10 package.
  .
  Both C and C++ bindings are present in this package.  Package
  libstdc++-dev is required to use the C++ bindings.  
@@ -56,11 +55,11 @@ Description: Multiprecision arithmetic library developers tools
  The MPFR library (multiple-precision floating-point) used to be
  included, but has since been moved to package libmpfr-dev.
 
-Package: lib32gmp3
+Package: lib32gmp10
 Section: libs
 Priority: optional
 Architecture: amd64 ppc64 kfreebsd-amd64
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: libc6-i386 (<= 2.9-18)
 Description: Multiprecision arithmetic library (32bit)
  GNU MP is a programmer's library for arbitrary precision
@@ -75,7 +74,7 @@ Package: lib32gmpxx4
 Section: libs
 Priority: optional
 Architecture: amd64 ppc64 kfreebsd-amd64
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: libc6-i386 (<= 2.9-18)
 Description: Multiprecision arithmetic library (C++ bindings, 32bit)
  GNU MP is a programmer's library for arbitrary precision
@@ -83,17 +82,19 @@ Description: Multiprecision arithmetic library (C++ bindings, 32bit)
  integer, rational, and floating point numeric types.  This
  package includes a 32 bit version of the shared library.
 
-Package: lib32gmp3-dev
+Package: lib32gmp10-dev
 Section: libdevel
 Priority: optional
 Architecture: amd64 ppc64 kfreebsd-amd64
-Depends: libgmp3-dev (= ${binary:Version}), lib32gmp3 (= ${binary:Version}), lib32gmpxx4 (= ${binary:Version})
-Suggests: libgmp3-doc, libmpfr-dev
-Conflicts: libc6-i386 (<= 2.9-18)
+Depends: libgmp10-dev (= ${binary:Version}), lib32gmp10 (= ${binary:Version}), lib32gmpxx4 (= ${binary:Version}), ${misc:Depends}
+Provides: lib32gmp-dev, lib32gmp3-dev
+Suggests: libgmp10-doc, libmpfr-dev
+Conflicts: libc6-i386 (<= 2.9-18), lib32gmp3-dev
+Replaces: lib32gmp3-dev
 Description: Multiprecision arithmetic library developers tools (32bit)
  This development package provides the header files and the symbolic
  links to allow compilation and linking of programs that use the
- libraries provided in the libgmp3 package.  This package includes 32
+ libraries provided in the libgmp10 package.  This package includes 32
  bit versions of the link libraries.
  .
  Both C and C++ bindings are present in this package.  Package
@@ -102,11 +103,11 @@ Description: Multiprecision arithmetic library developers tools (32bit)
  The MPFR library (multiple-precision floating-point) used to be
  included, but has since been moved to package libmpfr-dev.
 
-Package: lib64gmp3
+Package: lib64gmp10
 Section: libs
 Priority: optional
 Architecture: powerpc
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Multiprecision arithmetic library (64bit library)
  GNU MP is a programmer's library for arbitrary precision
  arithmetic (ie, a bignum package).  It can operate on signed
@@ -120,23 +121,26 @@ Package: lib64gmpxx4
 Section: libs
 Priority: optional
 Architecture: powerpc
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Multiprecision arithmetic library (C++ bindings, 64bit)
  GNU MP is a programmer's library for arbitrary precision
  arithmetic (ie, a bignum package).  It can operate on signed
  integer, rational, and floating point numeric types.  This
  package includes a 64 bit version of the shared library.
 
-Package: lib64gmp3-dev
+Package: lib64gmp10-dev
 Section: libdevel
 Priority: optional
 Architecture: powerpc
-Depends: libgmp3-dev (= ${binary:Version}), lib64gmp3 (= ${binary:Version}), lib64gmpxx4 (= ${binary:Version})
-Suggests: libgmp3-doc, libmpfr-dev
+Depends: libgmp10-dev (= ${binary:Version}), lib64gmp10 (= ${binary:Version}), lib64gmpxx4 (= ${binary:Version}), ${misc:Depends}
+Provides: lib64gmp-dev, lib64gmp3-dev
+Conflicts: lib64gmp3-dev
+Replaces: lib64gmp3-dev
+Suggests: libgmp10-doc, libmpfr-dev
 Description: Multiprecision arithmetic library developers tools (64bit)
  This development package provides the header files and the symbolic
  links to allow compilation and linking of programs that use the
- libraries provided in the libgmp3 package.  This package includes 64
+ libraries provided in the libgmp10 package.  This package includes 64
  bit versions of the link libraries.
  .
  Both C and C++ bindings are present in this package.  Package
@@ -145,11 +149,11 @@ Description: Multiprecision arithmetic library developers tools (64bit)
  The MPFR library (multiple-precision floating-point) used to be
  included, but has since been moved to package libmpfr-dev.
 
-Package: libgmp3-doc
+Package: libgmp10-doc
 Section: doc
 Priority: optional
 Architecture: all
-Replaces: libgmp3 (<< 3.1.1-8)
+Depends: ${misc:Depends}
 Description: Multiprecision arithmetic library example code
  This package provides example code illustrating the use of GMP.
 

@@ -1,3 +1,10 @@
+gmp (2:5.0.1+dfsg-6slp2+s1) unstable; urgency=low
+
+  * Merge with Debian.
+  * Update dependencies of scratchbox1 compatibility packages.
+
+ -- Rafal Krypa <r.krypa@samsung.com>  Mon, 14 Mar 2011 16:05:32 +0100
+
 gmp (2:5.0.1+dfsg-6) unstable; urgency=low
 
   * control: libgmp10-dev provides the old libgmp3-dev package.  This is a

@@ -1,3 +1,4 @@
+%define keepstatic 1
 Name:           gmp
 Version:        5.0.5
 Release:        0

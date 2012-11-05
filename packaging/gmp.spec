@@ -108,9 +108,10 @@ make check
 %files devel
 %defattr(-,root,root)
 %doc AUTHORS README NEWS
-%doc demos
 %doc %{_infodir}/gmp.info*.gz
 %{_libdir}/libgmp.a
+%{_libdir}/libmp.a
+%{_libdir}/libgmpxx.a
 %{_libdir}/libgmp.so
 %{_libdir}/libgmpxx.so
 %{_libdir}/libmp.so

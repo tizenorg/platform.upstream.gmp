@@ -1,21 +1,3 @@
-#
-# spec file for package gmp
-#
-# Copyright (c) 2012 SUSE LINUX Products GmbH, Nuernberg, Germany.
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
-#
-
-
 Name:           gmp
 Version:        5.0.5
 Release:        0
@@ -25,10 +7,7 @@ Url:            http://gmplib.org/
 Group:          System/Libraries
 Source:         %{name}-%{version}.tar.bz2
 Source2:        baselibs.conf
-Patch0:         gmp-noexec.diff
-Patch1:         gmp-5.0.5-remove-cpuid-abort.diff
 BuildRequires:  gcc-c++
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
 A library for calculating huge numbers (integer and floating point).
@@ -69,10 +48,6 @@ huge numbers (integer and floating point).
 
 %prep
 %setup -q
-%ifnarch %arm
-%patch0
-%endif
-%patch1 -p1
 
 %build
 export CFLAGS="%{optflags} -fexceptions";

@@ -75,11 +75,6 @@ make check
 
 %install
 %make_install
-rm %{buildroot}%{_libdir}/libgmp.la
-rm %{buildroot}%{_libdir}/libgmpxx.la
-rm %{buildroot}%{_libdir}/libgmpxx.a
-rm %{buildroot}%{_libdir}/libmp.a
-rm %{buildroot}%{_libdir}/libmp.la
 
 %post -n libgmp -p /sbin/ldconfig
 

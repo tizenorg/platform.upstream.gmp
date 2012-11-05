@@ -1,11 +1,3 @@
-
-# HG changeset patch
-# User Marco Bodrato <bodrato@mail.dm.unipi.it>
-# Date 1338104524 -7200
-# Node ID ffdad0cda019a912c0cbb4e159595c34a176139f
-# Parent  5e296f996b87f5bd747fc7075313911b42494d1e
-mpn/x86_64/fat/fat.c: abort iff longmode-capable-bit is turned off.
-
 diff -r 5e296f996b87 -r ffdad0cda019 mpn/x86_64/fat/fat.c
 --- a/mpn/x86_64/fat/fat.c	Thu May 24 14:26:27 2012 +0200
 +++ b/mpn/x86_64/fat/fat.c	Sun May 27 09:42:04 2012 +0200

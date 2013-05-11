@@ -91,6 +91,7 @@ make check
 %postun -n libmp -p /sbin/ldconfig
 
 %files
+%license COPYING
 %doc AUTHORS README NEWS
 
 %files -n libgmp

@@ -8,6 +8,7 @@ Url:            http://gmplib.org/
 Group:          System/Libraries
 Source:         %{name}-%{version}.tar.bz2
 Source2:        baselibs.conf
+Source1001: 	gmp.manifest
 BuildRequires:  gcc-c++
 
 %description
@@ -49,6 +50,7 @@ huge numbers (integer and floating point).
 
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
 %build
 export CFLAGS="%{optflags} -fexceptions";
@@ -91,22 +93,27 @@ make check
 %postun -n libmp -p /sbin/ldconfig
 
 %files
+%manifest %{name}.manifest
 %license COPYING
 %doc AUTHORS README NEWS
 
 %files -n libgmp
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_libdir}/libgmp.so.10*
 
 %files -n libgmpxx
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_libdir}/libgmpxx.so.4*
 
 %files -n libmp
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_libdir}/libmp.so.3*
 
 %files devel
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %doc AUTHORS README NEWS
 %doc %{_infodir}/gmp.info*.gz

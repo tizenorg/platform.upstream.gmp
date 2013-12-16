@@ -1,6 +1,6 @@
 %define keepstatic 1
 Name:           gmp
-Version:        5.0.5
+Version:        5.1.3
 Release:        0
 License:        GPL-3.0+ ; LGPL-3.0+
 Summary:        The GNU MP Library

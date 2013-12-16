@@ -1,6 +1,6 @@
 %define keepstatic 1
 Name:           gmp
-Version:        5.0.5
+Version:        5.1.3
 Release:        0
 License:        GPL-3.0+ ; LGPL-3.0+
 Summary:        The GNU MP Library
@@ -107,24 +107,14 @@ make check
 %defattr(-,root,root)
 %{_libdir}/libgmpxx.so.4*
 
-%files -n libmp
-%manifest %{name}.manifest
-%defattr(-,root,root)
-%{_libdir}/libmp.so.3*
-
 %files devel
 %manifest %{name}.manifest
 %defattr(-,root,root)
 %doc AUTHORS README NEWS
 %doc %{_infodir}/gmp.info*.gz
 %{_libdir}/libgmp.a
-%{_libdir}/libmp.a
 %{_libdir}/libgmpxx.a
 %{_libdir}/libgmp.so
 %{_libdir}/libgmpxx.so
-%{_libdir}/libmp.so
 /usr/include/gmp.h
 /usr/include/gmpxx.h
-/usr/include/mp.h
-
-%changelog

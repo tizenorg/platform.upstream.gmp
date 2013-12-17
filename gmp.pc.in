@@ -1,0 +1,13 @@
+# Package Information for pkg-config
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: gmp
+Description: A GNU arbitrary precision library
+Version: 5.1.3
+Requires:
+Libs: -L${libdir} -lgmp
+Cflags: -I${includedir}

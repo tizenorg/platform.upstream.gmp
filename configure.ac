@@ -3790,7 +3790,7 @@ AC_OUTPUT(Makefile							\
   tests/cxx/Makefile							\
   doc/Makefile tune/Makefile						\
   demos/Makefile demos/calc/Makefile demos/expr/Makefile		\
-  gmp.h:gmp-h.in)
+  gmp.h:gmp-h.in gmp.pc:gmp.pc.in)
 
 AC_MSG_NOTICE([summary of build options:
 

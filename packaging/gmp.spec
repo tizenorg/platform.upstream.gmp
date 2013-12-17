@@ -10,6 +10,7 @@ Source:         %{name}-%{version}.tar.bz2
 Source2:        baselibs.conf
 Source1001: 	gmp.manifest
 BuildRequires:  gcc-c++
+BuildRequires:  pkg-config
 
 %description
 A library for calculating huge numbers (integer and floating point).
@@ -54,21 +55,7 @@ cp %{SOURCE1001} .
 
 %build
 export CFLAGS="%{optflags} -fexceptions";
-./configure --build=%{_build} --host=%{_host} \
-         --program-prefix=%{?_program_prefix} \
-         --prefix=%{_prefix} \
-         --exec-prefix=%{_exec_prefix} \
-         --bindir=%{_bindir} \
-         --sbindir=%{_sbindir} \
-         --sysconfdir=%{_sysconfdir} \
-         --datadir=%{_datadir} \
-         --includedir=%{_includedir} \
-         --libdir=%{_libdir} \
-         --libexecdir=%{_libexecdir} \
-         --localstatedir=%{_localstatedir} \
-         --sharedstatedir=%{_sharedstatedir} \
-         --mandir=%{_mandir} \
-         --infodir=%{_infodir} \
+%reconfigure \
          --enable-mpbsd --enable-cxx
 make %{?_smp_mflags}
 
@@ -116,5 +103,6 @@ make check
 %{_libdir}/libgmpxx.a
 %{_libdir}/libgmp.so
 %{_libdir}/libgmpxx.so
+%{_libdir}/pkgconfig/gmp.pc
 /usr/include/gmp.h
 /usr/include/gmpxx.h

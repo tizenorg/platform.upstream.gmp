@@ -295,7 +295,8 @@ libgmpxx_la_LIBADD = $(libgmpxx_la_DEPENDENCIES)
 libgmpxx_la_LDFLAGS = $(GMP_LDFLAGS) $(LIBGMPXX_LDFLAGS) \
   -version-info $(LIBGMPXX_LT_CURRENT):$(LIBGMPXX_LT_REVISION):$(LIBGMPXX_LT_AGE)
 
-
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = gmp.pc
 
 install-data-hook:
 	@echo ''

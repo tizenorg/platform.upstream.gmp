@@ -177,6 +177,10 @@ cd ..
 
 %remove_docs
 
+mkdir -p %{buildroot}/usr/share/license
+cp -f COPYING %{buildroot}/usr/share/license/%{name}
+
+
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
@@ -193,6 +197,7 @@ rm -rf $RPM_BUILD_ROOT
 %ifarch %{ix86}
 %{_libdir}/sse2/*
 %endif
+/usr/share/license/%{name}
 
 %files devel
 %defattr(-,root,root,-)

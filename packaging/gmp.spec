@@ -30,20 +30,11 @@ Requires:       libgmp = %{version}
 %description -n libgmpxx
 C++ bindings for the GNU MP Library.
 
-%package -n libmp
-Summary:        BSD libmp bindings for the GNU MP Library
-Group:          System/Libraries
-Requires:       libgmp = %{version}
-
-%description -n libmp
-BSD libmp bindings for the GNU MP Library.
-
 %package devel
 Summary:        Include Files and Libraries for Development with the GNU MP Library
 Group:          Development/Languages/C and C++
 Requires:       libgmp = %{version}
 Requires:       libgmpxx = %{version}
-Requires:       libmp = %{version}
 
 %description devel
 These libraries are needed to develop programs which calculate with
@@ -70,14 +61,9 @@ make check
 
 %post -n libgmpxx -p /sbin/ldconfig
 
-%post -n libmp -p /sbin/ldconfig
-
-
 %postun -n libgmp -p /sbin/ldconfig
 
 %postun -n libgmpxx -p /sbin/ldconfig
-
-%postun -n libmp -p /sbin/ldconfig
 
 %files
 %manifest %{name}.manifest

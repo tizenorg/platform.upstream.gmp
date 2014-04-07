@@ -2,10 +2,10 @@
 Name:           gmp
 Version:        5.1.3
 Release:        0
-License:        GPL-3.0+ ; LGPL-3.0+
+License:        GPL-3.0+ and LGPL-3.0+
 Summary:        The GNU MP Library
 Url:            http://gmplib.org/
-Group:          System/Libraries
+Group:          Base/Libraries
 Source:         %{name}-%{version}.tar.bz2
 Source2:        baselibs.conf
 Source1001: 	gmp.manifest
@@ -17,14 +17,14 @@ A library for calculating huge numbers (integer and floating point).
 
 %package -n libgmp
 Summary:        Shared library for the GNU MP Library
-Group:          System/Libraries
+Group:          Base/Libraries
 
 %description -n libgmp
 Shared library for the GNU MP Library.
 
 %package -n libgmpxx
 Summary:        C++ bindings for the GNU MP Library
-Group:          System/Libraries
+Group:          Base/Libraries
 Requires:       libgmp = %{version}
 
 %description -n libgmpxx
@@ -32,7 +32,7 @@ C++ bindings for the GNU MP Library.
 
 %package devel
 Summary:        Include Files and Libraries for Development with the GNU MP Library
-Group:          Development/Languages/C and C++
+Group:          Base/Development
 Requires:       libgmp = %{version}
 Requires:       libgmpxx = %{version}
 
@@ -47,7 +47,7 @@ cp %{SOURCE1001} .
 %build
 export CFLAGS="%{optflags} -fexceptions";
 %reconfigure \
-         --enable-mpbsd --enable-cxx
+         --enable-cxx
 make %{?_smp_mflags}
 
 %check

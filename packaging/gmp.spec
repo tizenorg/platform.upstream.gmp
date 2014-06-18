@@ -54,6 +54,8 @@ rm -rf mpn/sparc*
 %build
 ./configure \
     --prefix=%{_prefix} \
+    --includedir=%{_includedir} \
+    --libdir=%{_libdir} \
     --enable-cxx \
     --enable-mpbsd
 

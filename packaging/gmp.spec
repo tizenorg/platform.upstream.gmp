@@ -1,8 +1,8 @@
 %define keepstatic 1
 Name:           gmp
-Version:        5.1.3
+Version:        6.0.0
 Release:        0
-License:        GPL-3.0+ and LGPL-3.0+
+License:        GPL-2.0 and LGPL-3.0+
 Summary:        The GNU MP Library
 Url:            http://gmplib.org/
 Group:          Base/Libraries
@@ -67,7 +67,7 @@ make check
 
 %files
 %manifest %{name}.manifest
-%license COPYING
+%license COPYINGv2
 %doc AUTHORS README NEWS
 
 %files -n libgmp

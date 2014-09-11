@@ -2,22 +2,33 @@ dnl  IA-64 mpn_add_n/mpn_sub_n -- mpn addition and subtraction.
 
 dnl  Contributed to the GNU project by Torbjorn Granlund.
 
-dnl  Copyright 2003, 2004, 2005, 2010, 2011 Free Software Foundation, Inc.
+dnl  Copyright 2003-2005, 2010, 2011 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
-
+dnl
 dnl  The GNU MP Library is free software; you can redistribute it and/or modify
-dnl  it under the terms of the GNU Lesser General Public License as published
-dnl  by the Free Software Foundation; either version 3 of the License, or (at
-dnl  your option) any later version.
-
+dnl  it under the terms of either:
+dnl
+dnl    * the GNU Lesser General Public License as published by the Free
+dnl      Software Foundation; either version 3 of the License, or (at your
+dnl      option) any later version.
+dnl
+dnl  or
+dnl
+dnl    * the GNU General Public License as published by the Free Software
+dnl      Foundation; either version 2 of the License, or (at your option) any
+dnl      later version.
+dnl
+dnl  or both in parallel, as here.
+dnl
 dnl  The GNU MP Library is distributed in the hope that it will be useful, but
 dnl  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-dnl  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-dnl  License for more details.
-
-dnl  You should have received a copy of the GNU Lesser General Public License
-dnl  along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.
+dnl  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+dnl  for more details.
+dnl
+dnl  You should have received copies of the GNU General Public License and the
+dnl  GNU Lesser General Public License along with the GNU MP Library.  If not,
+dnl  see https://www.gnu.org/licenses/.
 
 include(`../config.m4')
 
@@ -30,7 +41,7 @@ C  * Consider using special code for small n, using something like
 C    "switch (8 * (n >= 8) + (n mod 8))" to enter it and feed-in code.
 C  * The non-nc code was trimmed cycle for cycle to its current state.  It is
 C    probably hard to save more that an odd cycle there.  The nc code is much
-C    rawer (since tune/speed doesn't have any applicable direct measurements).
+C    cruder (since tune/speed doesn't have any applicable direct measurements).
 C  * Without the nc entry points, this becomes around 1800 bytes of object
 C    code; the nc code adds over 1000 bytes.  We should perhaps sacrifice a
 C    few cycles for the non-nc code and let it fall into the nc code.
@@ -81,7 +92,9 @@ PROLOGUE(func_nc)
 ifdef(`HAVE_ABI_32',`
 	addp4	rp = 0, rp		C			M I
 	addp4	up = 0, up		C			M I
+	nop.i	0
 	addp4	vp = 0, vp		C			M I
+	nop.m	0
 	zxt4	n = n			C			I
 	;;
 ')
@@ -106,8 +119,7 @@ ifdef(`HAVE_ABI_32',`
    (p7)	br.dptk	.Lc010			C			B
    (p8)	br.dptk	.Lc011			C			B
 	;;
-}
-{.mmi;	cmp.eq	p9, p0 = 4, r14		C			M I
+}{.mmi;	cmp.eq	p9, p0 = 4, r14		C			M I
 	cmp.eq	p10, p0 = 5, r14	C			M I
 	cmp.eq	p11, p0 = 6, r14	C			M I
 }{.bbb
@@ -335,8 +347,8 @@ ifdef(`HAVE_ABI_32',`
 	nop	0
 	;;
 .mmi;	ld8	v0 = [vp], 8		C			M01
-	cmp.CND	p6, p0 = w0, r10	C			M I
 	ld8	u0 = [up], 8		C			M01
+	cmp.CND	p6, p0 = w0, r10	C			M I
 .mbb;	ADDSUB	w1 = u1, v1		C			M I
   (p15)	br	L(c5)			C			B
 	br	L(end)			C			B
@@ -406,7 +418,6 @@ ifdef(`HAVE_ABI_32',`
 
 EPILOGUE()
 
-ASM_START()
 PROLOGUE(func)
 	.prologue
 	.save	ar.lc, r2
@@ -414,7 +425,9 @@ PROLOGUE(func)
 ifdef(`HAVE_ABI_32',`
 	addp4	rp = 0, rp		C			M I
 	addp4	up = 0, up		C			M I
+	nop.i	0
 	addp4	vp = 0, vp		C			M I
+	nop.m	0
 	zxt4	n = n			C			I
 	;;
 ')
@@ -612,7 +625,7 @@ L(gt4):
 .mmi;	add	upadv = PFDIST, up
 	add	vpadv = PFDIST, vp
 	mov	ar.lc = n		C			I0
-	ld8	v1 = [vp], 8		C			M01
+.mmi;	ld8	v1 = [vp], 8		C			M01
 	ld8	u1 = [up], 8		C			M01
 	nop	0
 	;;
@@ -644,7 +657,7 @@ L(gt4):
 .mmi;	add	upadv = PFDIST, up
 	add	vpadv = PFDIST, vp
 	add	rpx = 16, rp		C			M I
-	ld8	v3 = [vp], 8		C			M01
+.mmi;	ld8	v3 = [vp], 8		C			M01
 	ld8	u3 = [up], 8		C			M01
 	nop	0
 	;;

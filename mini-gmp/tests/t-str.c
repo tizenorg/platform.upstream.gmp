@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
+the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <assert.h>
 #include <limits.h>
@@ -30,14 +30,6 @@ the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
 
 #define GMP_LIMB_BITS (sizeof(mp_limb_t) * CHAR_BIT)
 #define MAXLIMBS ((MAXBITS + GMP_LIMB_BITS - 1) / GMP_LIMB_BITS)
-
-static void
-dump (const char *label, const mpz_t x)
-{
-  char *buf = mpz_get_str (NULL, 16, x);
-  fprintf (stderr, "%s: %s\n", label, buf);
-  testfree (buf);
-}
 
 static void
 test_small (void)

@@ -1,8 +1,7 @@
 /* Reference mpn functions, designed to be simple, portable and independent
    of the normal gmp code.  Speed isn't a consideration.
 
-Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-2007, 2008, 2009, 2011, 2012, 2013 Free Software Foundation, Inc.
+Copyright 1996-2009, 2011-2013 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -17,7 +16,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
+the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 
 /* Most routines have assertions representing what the mpn routines are
@@ -69,8 +68,8 @@ byte_overlap_p (const void *v_xp, mp_size_t xsize,
 int
 refmpn_overlap_p (mp_srcptr xp, mp_size_t xsize, mp_srcptr yp, mp_size_t ysize)
 {
-  return byte_overlap_p (xp, xsize * BYTES_PER_MP_LIMB,
-			 yp, ysize * BYTES_PER_MP_LIMB);
+  return byte_overlap_p (xp, xsize * GMP_LIMB_BYTES,
+			 yp, ysize * GMP_LIMB_BYTES);
 }
 
 /* Check overlap for a routine defined to work low to high. */
@@ -109,7 +108,7 @@ refmpn_malloc_limbs (mp_size_t size)
   ASSERT (size >= 0);
   if (size == 0)
     size = 1;
-  p = (mp_ptr) malloc ((size_t) (size * BYTES_PER_MP_LIMB));
+  p = (mp_ptr) malloc ((size_t) (size * GMP_LIMB_BYTES));
   ASSERT (p != NULL);
   return p;
 }
@@ -597,7 +596,7 @@ refmpn_sub_n (mp_ptr rp, mp_srcptr s1p, mp_srcptr s2p, mp_size_t size)
 }
 
 mp_limb_t
-refmpn_addcnd_n (mp_ptr rp, mp_srcptr s1p, mp_srcptr s2p, mp_size_t size, mp_limb_t cnd)
+refmpn_cnd_add_n (mp_limb_t cnd, mp_ptr rp, mp_srcptr s1p, mp_srcptr s2p, mp_size_t size)
 {
   if (cnd != 0)
     return refmpn_add_n (rp, s1p, s2p, size);
@@ -608,7 +607,7 @@ refmpn_addcnd_n (mp_ptr rp, mp_srcptr s1p, mp_srcptr s2p, mp_size_t size, mp_lim
     }
 }
 mp_limb_t
-refmpn_subcnd_n (mp_ptr rp, mp_srcptr s1p, mp_srcptr s2p, mp_size_t size, mp_limb_t cnd)
+refmpn_cnd_sub_n (mp_limb_t cnd, mp_ptr rp, mp_srcptr s1p, mp_srcptr s2p, mp_size_t size)
 {
   if (cnd != 0)
     return refmpn_sub_n (rp, s1p, s2p, size);
@@ -852,11 +851,11 @@ refmpn_addlsh2_n_ip2 (mp_ptr rp, mp_srcptr vp, mp_size_t n)
 }
 mp_limb_t
 refmpn_addlsh_nc (mp_ptr rp, mp_srcptr up, mp_srcptr vp,
-		 mp_size_t n, unsigned int s, mp_limb_t carry)
+		  mp_size_t n, unsigned int s, mp_limb_t carry)
 {
   mp_limb_t cy;
 
-  ASSERT (carry >= 0 && carry <= (CNST_LIMB(1) << s));
+  ASSERT (carry <= (CNST_LIMB(1) << s));
 
   cy = refmpn_addlsh_n (rp, up, vp, n, s);
   cy += refmpn_add_1 (rp, rp, n, carry);
@@ -934,11 +933,11 @@ refmpn_sublsh2_n_ip2 (mp_ptr rp, mp_srcptr vp, mp_size_t n)
 }
 mp_limb_t
 refmpn_sublsh_nc (mp_ptr rp, mp_srcptr up, mp_srcptr vp,
-		 mp_size_t n, unsigned int s, mp_limb_t carry)
+		  mp_size_t n, unsigned int s, mp_limb_t carry)
 {
   mp_limb_t cy;
 
-  ASSERT (carry >= 0 && carry <= (CNST_LIMB(1) << s));
+  ASSERT (carry <= (CNST_LIMB(1) << s));
 
   cy = refmpn_sublsh_n (rp, up, vp, n, s);
   cy += refmpn_sub_1 (rp, rp, n, carry);
@@ -986,7 +985,7 @@ refmpn_rsblsh2_n (mp_ptr rp, mp_srcptr up, mp_srcptr vp, mp_size_t n)
 }
 mp_limb_signed_t
 refmpn_rsblsh_nc (mp_ptr rp, mp_srcptr up, mp_srcptr vp,
-		 mp_size_t n, unsigned int s, mp_limb_signed_t carry)
+		  mp_size_t n, unsigned int s, mp_limb_signed_t carry)
 {
   mp_limb_signed_t cy;
 
@@ -2353,7 +2352,7 @@ refmpn_get_str (unsigned char *dst, int base, mp_ptr src, mp_size_t size)
 
   MPN_SIZEINBASE (dsize, src, size, base);
   ASSERT (dsize >= 1);
-  ASSERT (! byte_overlap_p (dst, (mp_size_t) dsize, src, size * BYTES_PER_MP_LIMB));
+  ASSERT (! byte_overlap_p (dst, (mp_size_t) dsize, src, size * GMP_LIMB_BYTES));
 
   if (size == 0)
     {
@@ -2399,7 +2398,7 @@ ref_bswap_limb (mp_limb_t src)
   int        i;
 
   dst = 0;
-  for (i = 0; i < BYTES_PER_MP_LIMB; i++)
+  for (i = 0; i < GMP_LIMB_BYTES; i++)
     {
       dst = (dst << 8) + (src & 0xFF);
       src >>= 8;

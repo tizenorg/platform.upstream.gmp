@@ -1,22 +1,32 @@
 dnl  x86-64 mpn_divrem_1 -- mpn by limb division.
 
-dnl  Copyright 2004, 2005, 2007, 2008, 2009, 2010, 2011, 2012 Free Software
-dnl  Foundation, Inc.
+dnl  Copyright 2004, 2005, 2007-2012 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
-
+dnl
 dnl  The GNU MP Library is free software; you can redistribute it and/or modify
-dnl  it under the terms of the GNU Lesser General Public License as published
-dnl  by the Free Software Foundation; either version 3 of the License, or (at
-dnl  your option) any later version.
-
+dnl  it under the terms of either:
+dnl
+dnl    * the GNU Lesser General Public License as published by the Free
+dnl      Software Foundation; either version 3 of the License, or (at your
+dnl      option) any later version.
+dnl
+dnl  or
+dnl
+dnl    * the GNU General Public License as published by the Free Software
+dnl      Foundation; either version 2 of the License, or (at your option) any
+dnl      later version.
+dnl
+dnl  or both in parallel, as here.
+dnl
 dnl  The GNU MP Library is distributed in the hope that it will be useful, but
 dnl  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-dnl  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-dnl  License for more details.
-
-dnl  You should have received a copy of the GNU Lesser General Public License
-dnl  along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.
+dnl  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+dnl  for more details.
+dnl
+dnl  You should have received copies of the GNU General Public License and the
+dnl  GNU Lesser General Public License along with the GNU MP Library.  If not,
+dnl  see https://www.gnu.org/licenses/.
 
 include(`../config.m4')
 
@@ -141,8 +151,7 @@ IFSTD(`	pop	%rdi		')
 	jmp	L(nent)
 
 	ALIGN(16)
-L(ntop):				C	    K8-K10  P6-CNR P6-NHM  P4
-	mov	(up,un,8), %r10		C
+L(ntop):mov	(up,un,8), %r10		C	    K8-K10  P6-CNR P6-NHM  P4
 	mul	dinv			C	      0,13   0,20   0,18   0,45
 	add	%r10, %rax		C	      4      8      3     12
 	adc	%rbp, %rdx		C	      5      9     10     13

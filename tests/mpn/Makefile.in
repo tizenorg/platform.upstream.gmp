@@ -15,8 +15,7 @@
 
 @SET_MAKE@
 
-# Copyright 2001, 2002, 2003, 2009, 2010, 2011, 2012 Free Software Foundation,
-# Inc.
+# Copyright 2001-2003, 2009-2014 Free Software Foundation, Inc.
 #
 # This file is part of the GNU MP Library test suite.
 #
@@ -31,7 +30,7 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along with
-# the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.
+# the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -82,7 +81,8 @@ check_PROGRAMS = t-asmtype$(EXEEXT) t-aors_1$(EXEEXT) \
 	t-mulmod_bnm1$(EXEEXT) t-sqrmod_bnm1$(EXEEXT) \
 	t-mulmid$(EXEEXT) t-hgcd$(EXEEXT) t-hgcd_appr$(EXEEXT) \
 	t-matrix22$(EXEEXT) t-invert$(EXEEXT) t-div$(EXEEXT) \
-	t-bdiv$(EXEEXT) t-broot$(EXEEXT) t-brootinv$(EXEEXT)
+	t-bdiv$(EXEEXT) t-broot$(EXEEXT) t-brootinv$(EXEEXT) \
+	t-minvert$(EXEEXT) t-sizeinbase$(EXEEXT)
 subdir = tests/mpn
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -174,6 +174,11 @@ t_matrix22_OBJECTS = t-matrix22.$(OBJEXT)
 t_matrix22_LDADD = $(LDADD)
 t_matrix22_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
+t_minvert_SOURCES = t-minvert.c
+t_minvert_OBJECTS = t-minvert.$(OBJEXT)
+t_minvert_LDADD = $(LDADD)
+t_minvert_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
 t_mod_1_SOURCES = t-mod_1.c
 t_mod_1_OBJECTS = t-mod_1.$(OBJEXT)
 t_mod_1_LDADD = $(LDADD)
@@ -213,6 +218,11 @@ t_scan_SOURCES = t-scan.c
 t_scan_OBJECTS = t-scan.$(OBJEXT)
 t_scan_LDADD = $(LDADD)
 t_scan_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
+t_sizeinbase_SOURCES = t-sizeinbase.c
+t_sizeinbase_OBJECTS = t-sizeinbase.$(OBJEXT)
+t_sizeinbase_LDADD = $(LDADD)
+t_sizeinbase_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
 t_sqrmod_bnm1_SOURCES = t-sqrmod_bnm1.c
 t_sqrmod_bnm1_OBJECTS = t-sqrmod_bnm1.$(OBJEXT)
@@ -324,21 +334,23 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = logic.c t-aors_1.c t-asmtype.c t-bdiv.c t-broot.c \
 	t-brootinv.c t-div.c t-divrem_1.c t-fat.c t-get_d.c t-hgcd.c \
 	t-hgcd_appr.c t-instrument.c t-invert.c t-iord_u.c \
-	t-matrix22.c t-mod_1.c t-mp_bases.c t-mul.c t-mullo.c \
-	t-mulmid.c t-mulmod_bnm1.c t-perfsqr.c t-scan.c \
-	t-sqrmod_bnm1.c t-toom2-sqr.c t-toom22.c t-toom3-sqr.c \
-	t-toom32.c t-toom33.c t-toom4-sqr.c t-toom42.c t-toom43.c \
-	t-toom44.c t-toom52.c t-toom53.c t-toom54.c t-toom6-sqr.c \
-	t-toom62.c t-toom63.c t-toom6h.c t-toom8-sqr.c t-toom8h.c
+	t-matrix22.c t-minvert.c t-mod_1.c t-mp_bases.c t-mul.c \
+	t-mullo.c t-mulmid.c t-mulmod_bnm1.c t-perfsqr.c t-scan.c \
+	t-sizeinbase.c t-sqrmod_bnm1.c t-toom2-sqr.c t-toom22.c \
+	t-toom3-sqr.c t-toom32.c t-toom33.c t-toom4-sqr.c t-toom42.c \
+	t-toom43.c t-toom44.c t-toom52.c t-toom53.c t-toom54.c \
+	t-toom6-sqr.c t-toom62.c t-toom63.c t-toom6h.c t-toom8-sqr.c \
+	t-toom8h.c
 DIST_SOURCES = logic.c t-aors_1.c t-asmtype.c t-bdiv.c t-broot.c \
 	t-brootinv.c t-div.c t-divrem_1.c t-fat.c t-get_d.c t-hgcd.c \
 	t-hgcd_appr.c t-instrument.c t-invert.c t-iord_u.c \
-	t-matrix22.c t-mod_1.c t-mp_bases.c t-mul.c t-mullo.c \
-	t-mulmid.c t-mulmod_bnm1.c t-perfsqr.c t-scan.c \
-	t-sqrmod_bnm1.c t-toom2-sqr.c t-toom22.c t-toom3-sqr.c \
-	t-toom32.c t-toom33.c t-toom4-sqr.c t-toom42.c t-toom43.c \
-	t-toom44.c t-toom52.c t-toom53.c t-toom54.c t-toom6-sqr.c \
-	t-toom62.c t-toom63.c t-toom6h.c t-toom8-sqr.c t-toom8h.c
+	t-matrix22.c t-minvert.c t-mod_1.c t-mp_bases.c t-mul.c \
+	t-mullo.c t-mulmid.c t-mulmod_bnm1.c t-perfsqr.c t-scan.c \
+	t-sizeinbase.c t-sqrmod_bnm1.c t-toom2-sqr.c t-toom22.c \
+	t-toom3-sqr.c t-toom32.c t-toom33.c t-toom4-sqr.c t-toom42.c \
+	t-toom43.c t-toom44.c t-toom52.c t-toom53.c t-toom54.c \
+	t-toom6-sqr.c t-toom62.c t-toom63.c t-toom6h.c t-toom8-sqr.c \
+	t-toom8h.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -603,6 +615,9 @@ t-iord_u$(EXEEXT): $(t_iord_u_OBJECTS) $(t_iord_u_DEPENDENCIES) $(EXTRA_t_iord_u
 t-matrix22$(EXEEXT): $(t_matrix22_OBJECTS) $(t_matrix22_DEPENDENCIES) $(EXTRA_t_matrix22_DEPENDENCIES) 
 	@rm -f t-matrix22$(EXEEXT)
 	$(LINK) $(t_matrix22_OBJECTS) $(t_matrix22_LDADD) $(LIBS)
+t-minvert$(EXEEXT): $(t_minvert_OBJECTS) $(t_minvert_DEPENDENCIES) $(EXTRA_t_minvert_DEPENDENCIES) 
+	@rm -f t-minvert$(EXEEXT)
+	$(LINK) $(t_minvert_OBJECTS) $(t_minvert_LDADD) $(LIBS)
 t-mod_1$(EXEEXT): $(t_mod_1_OBJECTS) $(t_mod_1_DEPENDENCIES) $(EXTRA_t_mod_1_DEPENDENCIES) 
 	@rm -f t-mod_1$(EXEEXT)
 	$(LINK) $(t_mod_1_OBJECTS) $(t_mod_1_LDADD) $(LIBS)
@@ -627,6 +642,9 @@ t-perfsqr$(EXEEXT): $(t_perfsqr_OBJECTS) $(t_perfsqr_DEPENDENCIES) $(EXTRA_t_per
 t-scan$(EXEEXT): $(t_scan_OBJECTS) $(t_scan_DEPENDENCIES) $(EXTRA_t_scan_DEPENDENCIES) 
 	@rm -f t-scan$(EXEEXT)
 	$(LINK) $(t_scan_OBJECTS) $(t_scan_LDADD) $(LIBS)
+t-sizeinbase$(EXEEXT): $(t_sizeinbase_OBJECTS) $(t_sizeinbase_DEPENDENCIES) $(EXTRA_t_sizeinbase_DEPENDENCIES) 
+	@rm -f t-sizeinbase$(EXEEXT)
+	$(LINK) $(t_sizeinbase_OBJECTS) $(t_sizeinbase_LDADD) $(LIBS)
 t-sqrmod_bnm1$(EXEEXT): $(t_sqrmod_bnm1_OBJECTS) $(t_sqrmod_bnm1_DEPENDENCIES) $(EXTRA_t_sqrmod_bnm1_DEPENDENCIES) 
 	@rm -f t-sqrmod_bnm1$(EXEEXT)
 	$(LINK) $(t_sqrmod_bnm1_OBJECTS) $(t_sqrmod_bnm1_LDADD) $(LIBS)

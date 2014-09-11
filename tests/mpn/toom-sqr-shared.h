@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
+the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 
 #include <stdlib.h>
@@ -29,7 +29,7 @@ the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
  * MIN_AN, MAX_AN and then include this file. */
 
 #ifndef COUNT
-#define COUNT 500
+#define COUNT 2000
 #endif
 
 int

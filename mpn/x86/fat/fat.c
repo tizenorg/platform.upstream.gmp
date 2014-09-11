@@ -9,17 +9,28 @@ Copyright 2003, 2004, 2011, 2012 Free Software Foundation, Inc.
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 3 of the License, or (at your
-option) any later version.
+it under the terms of either:
+
+  * the GNU Lesser General Public License as published by the Free
+    Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+
+or
+
+  * the GNU General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option) any
+    later version.
+
+or both in parallel, as here.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-License for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.  */
+You should have received copies of the GNU General Public License and the
+GNU Lesser General Public License along with the GNU MP Library.  If not,
+see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>    /* for printf */
 #include <stdlib.h>   /* for getenv */
@@ -30,9 +41,6 @@ along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.  */
 
 /* Change this to "#define TRACE(x) x" for some traces. */
 #define TRACE(x)
-
-/* Change this to 1 to take the cpuid from GMP_CPU_TYPE env var. */
-#define WANT_FAKE_CPUID  0
 
 
 /* fat_entry.asm */
@@ -71,6 +79,7 @@ static struct {
   { "coreinhm",   "GenuineIntel", MAKE_FMS (6, 0x1a) },
   { "coreiwsm",   "GenuineIntel", MAKE_FMS (6, 0x25) },
   { "coreisbr",   "GenuineIntel", MAKE_FMS (6, 0x2a) },
+  { "coreihwl",   "GenuineIntel", MAKE_FMS (6, 0x3c) },
   { "atom",       "GenuineIntel", MAKE_FMS (6, 0x1c) },
 
   { "k5",         "AuthenticAMD", MAKE_FMS (5, 0) },
@@ -144,6 +153,8 @@ struct cpuvec_t __gmpn_cpuvec = {
   __MPN(addmul_1_init),
   0,
   __MPN(bdiv_dbm1c_init),
+  __MPN(cnd_add_n_init),
+  __MPN(cnd_sub_n_init),
   __MPN(com_init),
   __MPN(copyd_init),
   __MPN(copyi_init),
@@ -275,7 +286,7 @@ __gmpn_cpuvec_init (void)
 		case 0x09:		/* Banias */
 		case 0x0d:		/* Dothan */
 		case 0x0e:		/* Yonah */
-		  TRACE (printf ("  Banias/Bothan/Yonah\n"));
+		  TRACE (printf ("  Banias/Dothan/Yonah\n"));
                   CPUVEC_SETUP_p6_mmx;
                   CPUVEC_SETUP_p6_p3mmx;
                   CPUVEC_SETUP_p6_sse2;
@@ -390,9 +401,9 @@ __gmpn_cpuvec_init (void)
 
             case 0x0f:		/* k8 */
             case 0x11:		/* "fam 11h", mix of k8 and k10 */
-            case 0x13:		/* unknown, conservativeky assume k8  */
-            case 0x16:		/* unknown, conservativeky assume k8  */
-            case 0x17:		/* unknown, conservativeky assume k8  */
+            case 0x13:		/* unknown, conservatively assume k8  */
+            case 0x16:		/* unknown, conservatively assume k8  */
+            case 0x17:		/* unknown, conservatively assume k8  */
               TRACE (printf ("  k8\n"));
               CPUVEC_SETUP_k7;
               CPUVEC_SETUP_k7_mmx;

@@ -4,23 +4,33 @@ divert(-1)
 dnl  m4 macros for x86 assembler.
 
 
-dnl  Copyright 1999, 2000, 2001, 2002, 2003, 2007, 2010, 2012 Free Software
-dnl  Foundation, Inc.
-dnl
+dnl  Copyright 1999-2003, 2007, 2010, 2012 Free Software Foundation, Inc.
+
 dnl  This file is part of the GNU MP Library.
 dnl
-dnl  The GNU MP Library is free software; you can redistribute it and/or
-dnl  modify it under the terms of the GNU Lesser General Public License as
-dnl  published by the Free Software Foundation; either version 3 of the
-dnl  License, or (at your option) any later version.
+dnl  The GNU MP Library is free software; you can redistribute it and/or modify
+dnl  it under the terms of either:
 dnl
-dnl  The GNU MP Library is distributed in the hope that it will be useful,
-dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-dnl  Lesser General Public License for more details.
+dnl    * the GNU Lesser General Public License as published by the Free
+dnl      Software Foundation; either version 3 of the License, or (at your
+dnl      option) any later version.
 dnl
-dnl  You should have received a copy of the GNU Lesser General Public License
-dnl  along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.
+dnl  or
+dnl
+dnl    * the GNU General Public License as published by the Free Software
+dnl      Foundation; either version 2 of the License, or (at your option) any
+dnl      later version.
+dnl
+dnl  or both in parallel, as here.
+dnl
+dnl  The GNU MP Library is distributed in the hope that it will be useful, but
+dnl  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+dnl  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+dnl  for more details.
+dnl
+dnl  You should have received copies of the GNU General Public License and the
+dnl  GNU Lesser General Public License along with the GNU MP Library.  If not,
+dnl  see https://www.gnu.org/licenses/.
 
 
 dnl  Notes:
@@ -41,7 +51,7 @@ dnl     This is only a problem in macro definitions, not in ordinary text,
 dnl     and not in macro parameters like text passed to forloop() or ifdef().
 
 
-deflit(BYTES_PER_MP_LIMB, 4)
+deflit(GMP_LIMB_BYTES, 4)
 
 
 dnl  Libtool gives -DPIC -DDLL_EXPORT to indicate a cygwin or mingw DLL.  We
@@ -63,6 +73,8 @@ define(CPUVEC_FUNCS_LIST,
 `addmul_1',
 `addmul_2',
 `bdiv_dbm1c',
+`cnd_add_n',
+`cnd_sub_n',
 `com',
 `copyd',
 `copyi',

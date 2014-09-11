@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
+the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 
 #include <stdlib.h>		/* for strtol */
@@ -63,7 +63,6 @@ main (int argc, char **argv)
     {
       mp_size_t n;
       mp_limb_t k;
-      int c;
 
       n = 1 + gmp_urandomm_ui (rands, MAX_LIMBS);
 

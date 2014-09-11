@@ -1,22 +1,32 @@
 /* Create tuned thresholds for various algorithms.
 
-Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2009, 2010,
-2011, 2012 Free Software Foundation, Inc.
+Copyright 1999-2003, 2005, 2006, 2008-2012 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 3 of the License, or (at your
-option) any later version.
+it under the terms of either:
+
+  * the GNU Lesser General Public License as published by the Free
+    Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+
+or
+
+  * the GNU General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option) any
+    later version.
+
+or both in parallel, as here.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-License for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.  */
+You should have received copies of the GNU General Public License and the
+GNU Lesser General Public License along with the GNU MP Library.  If not,
+see https://www.gnu.org/licenses/.  */
 
 
 /* Usage: tuneup [-t] [-t] [-p precision]
@@ -198,6 +208,9 @@ mp_size_t  hgcd_appr_threshold          = MP_SIZE_T_MAX;
 mp_size_t  hgcd_reduce_threshold        = MP_SIZE_T_MAX;
 mp_size_t  gcd_dc_threshold             = MP_SIZE_T_MAX;
 mp_size_t  gcdext_dc_threshold          = MP_SIZE_T_MAX;
+int	   div_qr_1n_pi1_method		= 0;
+mp_size_t  div_qr_1_norm_threshold      = MP_SIZE_T_MAX;
+mp_size_t  div_qr_1_unnorm_threshold    = MP_SIZE_T_MAX;
 mp_size_t  divrem_1_norm_threshold      = MP_SIZE_T_MAX;
 mp_size_t  divrem_1_unnorm_threshold    = MP_SIZE_T_MAX;
 mp_size_t  mod_1_norm_threshold         = MP_SIZE_T_MAX;
@@ -249,6 +262,9 @@ struct param_t {
 #endif
 #ifndef HAVE_NATIVE_mpn_divexact_1
 #define HAVE_NATIVE_mpn_divexact_1 0
+#endif
+#ifndef HAVE_NATIVE_mpn_div_qr_1n_pi1
+#define HAVE_NATIVE_mpn_div_qr_1n_pi1 0
 #endif
 #ifndef HAVE_NATIVE_mpn_divrem_1
 #define HAVE_NATIVE_mpn_divrem_1 0
@@ -367,9 +383,10 @@ analyze_dat (int final)
 }
 
 
-/* Measuring for recompiled mpn/generic/divrem_1.c, mpn/generic/mod_1.c
- * and mpz/fac_ui.c */
+/* Measuring for recompiled mpn/generic/div_qr_1.c,
+ * mpn/generic/divrem_1.c, mpn/generic/mod_1.c and mpz/fac_ui.c */
 
+mp_limb_t mpn_div_qr_1_tune (mp_ptr, mp_limb_t *, mp_srcptr, mp_size_t, mp_limb_t);
 mp_limb_t mpn_divrem_1_tune (mp_ptr, mp_size_t, mp_srcptr, mp_size_t, mp_limb_t);
 mp_limb_t mpn_mod_1_tune (mp_srcptr, mp_size_t, mp_limb_t);
 void mpz_fac_ui_tune (mpz_ptr, unsigned long);
@@ -389,7 +406,11 @@ speed_mpz_fac_ui_tune (struct speed_params *s)
 {
   SPEED_ROUTINE_MPZ_FAC_UI (mpz_fac_ui_tune);
 }
-
+double
+speed_mpn_div_qr_1_tune (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_DIV_QR_1 (mpn_div_qr_1_tune);
+}
 
 double
 tuneup_measure (speed_function_t fun,
@@ -1828,7 +1849,7 @@ tune_gcdext_dc (void)
 
 /* In tune_powm_sec we compute the table used by the win_size function.  The
    cutoff points are in exponent bits, disregarding other operand sizes.  It is
-   not possible to use the one framework since it currently uses a granilarity
+   not possible to use the one framework since it currently uses a granularity
    of full limbs.
 */
 
@@ -1860,7 +1881,7 @@ tune_powm_sec (void)
   k = 1;
 
   winsize = 10;			/* the itch function needs this */
-  itch = mpn_powm_sec_itch (n_max, n_max, n_max);
+  itch = mpn_sec_powm_itch (n_max, n_max * GMP_NUMB_BITS, n_max);
 
   rp = TMP_ALLOC_LIMBS (n_max);
   bp = TMP_ALLOC_LIMBS (n_max);
@@ -1890,7 +1911,10 @@ tune_powm_sec (void)
 
   printf ("#define POWM_SEC_TABLE  ");
 
-  for (nbits = 1; nbits <= n_max * GMP_NUMB_BITS; )
+  /* For nbits == 1, we should always use k == 1, so no need to tune
+     that. Starting with nbits == 2 also ensure that nbits always is
+     larger than the windowsize k+1. */
+  for (nbits = 2; nbits <= n_max * GMP_NUMB_BITS; )
     {
       n = (nbits - 1) / GMP_NUMB_BITS + 1;
 
@@ -1899,16 +1923,11 @@ tune_powm_sec (void)
       for (i = 0; i < n; i++)
 	ep[i] = ~CNST_LIMB(0);
 
-      /* Truncate E to be exactly nbits large.  */
-      if (nbits % GMP_NUMB_BITS != 0)
-	mpn_rshift (ep, ep, n, GMP_NUMB_BITS - nbits % GMP_NUMB_BITS);
-      ep[n - 1] |= CNST_LIMB(1) << (nbits - 1) % GMP_NUMB_BITS;
-
       winsize = k;
       for (i = 0; i < n_measurements; i++)
 	{
 	  speed_starttime ();
-	  mpn_powm_sec (rp, bp, n, ep, n, mp, n, tp);
+	  mpn_sec_powm (rp, bp, n, ep, nbits, mp, n, tp);
 	  ttab[i] = speed_endtime ();
 	}
       tk = median (ttab, n_measurements);
@@ -1918,7 +1937,7 @@ tune_powm_sec (void)
       for (i = 0; i < n_measurements; i++)
 	{
 	  speed_starttime ();
-	  mpn_powm_sec (rp, bp, n, ep, n, mp, n, tp);
+	  mpn_sec_powm (rp, bp, n, ep, nbits, mp, n, tp);
 	  ttab[i] = speed_endtime ();
 	}
       tkp1 = median (ttab, n_measurements);
@@ -1931,6 +1950,10 @@ tune_powm_sec (void)
 	  if (possible_nbits_cutoff)
 	    {
 	      /* Two consecutive sizes indicate k increase, obey.  */
+
+	      /* Must always have x[k] >= k */
+	      ASSERT_ALWAYS (possible_nbits_cutoff >= k);
+
 	      if (k > 1)
 		printf (",");
 	      printf ("%ld", (long) possible_nbits_cutoff);
@@ -1941,7 +1964,10 @@ tune_powm_sec (void)
 	    {
 	      /* One measurement indicate k increase, save nbits for further
 		 consideration.  */
-	      possible_nbits_cutoff = nbits;
+	      /* The new larger k gets used for sizes > the cutoff
+		 value, hence the cutoff should be one less than the
+		 smallest size where it gives a speedup. */
+	      possible_nbits_cutoff = nbits - 1;
 	    }
 	}
       else
@@ -2023,6 +2049,55 @@ tune_divrem_1 (void)
     s.r = randlimb_half ();
     param.function = speed_mpn_divrem_1_tune;
     one (&divrem_1_unnorm_threshold, &param);
+  }
+}
+
+void
+tune_div_qr_1 (void)
+{
+  static struct param_t  param;
+  double            t1, t2;
+
+  if (!HAVE_NATIVE_mpn_div_qr_1n_pi1)
+    {
+      static struct param_t  param;
+      double   t1, t2;
+
+      s.size = 10;
+      s.r = randlimb_norm ();
+
+      t1 = tuneup_measure (speed_mpn_div_qr_1n_pi1_1, &param, &s);
+      t2 = tuneup_measure (speed_mpn_div_qr_1n_pi1_2, &param, &s);
+
+      if (t1 == -1.0 || t2 == -1.0)
+	{
+	  printf ("Oops, can't measure all mpn_div_qr_1n_pi1 methods at %ld\n",
+		  (long) s.size);
+	  abort ();
+	}
+      div_qr_1n_pi1_method = (t1 < t2) ? 1 : 2;
+      print_define ("DIV_QR_1N_PI1_METHOD", div_qr_1n_pi1_method);
+    }
+
+  {
+    static struct param_t  param;
+    param.name = "DIV_QR_1_NORM_THRESHOLD";
+    DIV_1_PARAMS;
+    param.min_size = 1;
+    param.min_is_always = 0;
+    s.r = randlimb_norm ();
+    param.function = speed_mpn_div_qr_1_tune;
+    one (&div_qr_1_norm_threshold, &param);
+  }
+  {
+    static struct param_t  param;
+    param.name = "DIV_QR_1_UNNORM_THRESHOLD";
+    DIV_1_PARAMS;
+    param.min_size = 1;
+    param.min_is_always = 0;
+    s.r = randlimb_half();
+    param.function = speed_mpn_div_qr_1_tune;
+    one (&div_qr_1_unnorm_threshold, &param);
   }
 }
 
@@ -2540,7 +2615,7 @@ speed_mpn_pre_set_str (struct speed_params *s)
   ASSERT_ALWAYS (mpn_set_str (wp, str, s->size, base) <= wn);
   */
 
-  speed_operand_src (s, (mp_ptr) str, s->size/BYTES_PER_MP_LIMB);
+  speed_operand_src (s, (mp_ptr) str, s->size/GMP_LIMB_BYTES);
   speed_operand_dst (s, wp, wn);
   speed_cache_fill (s);
 
@@ -2722,6 +2797,7 @@ all (void)
   tune_divrem_1 ();
   tune_mod_1 ();
   tune_preinv_divrem_1 ();
+  tune_div_qr_1 ();
 #if 0
   tune_divrem_2 ();
 #endif

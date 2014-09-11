@@ -1,7 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-# Copyright 1996, 1997, 1999, 2000, 2001, 2002, 2003, 2009, 2012 Free Software
-# Foundation, Inc.
+# Copyright 1996, 1997, 1999-2003, 2009, 2012 Free Software Foundation, Inc.
 #
 # This file is part of the GNU MP Library test suite.
 #
@@ -16,7 +15,7 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along with
-# the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.
+# the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.
 
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/tests
@@ -30,7 +29,7 @@ check_PROGRAMS = t-addsub t-cmp t-mul t-mul_i t-tdiv t-tdiv_ui t-fdiv   \
   t-fac_ui t-mfac_uiui t-primorial_ui t-fib_ui t-lucnum_ui t-scan t-fits   \
   t-divis t-divis_2exp t-cong t-cong_2exp t-sizeinbase t-set_str        \
   t-aorsmul t-cmp_d t-cmp_si t-hamdist t-oddeven t-popcount t-set_f     \
-  t-io_raw t-import t-export t-pprime_p t-nextprime t-remove
+  t-io_raw t-import t-export t-pprime_p t-nextprime t-remove t-limbs
 
 TESTS = $(check_PROGRAMS)
 

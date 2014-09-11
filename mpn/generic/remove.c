@@ -7,22 +7,33 @@
    SAFE TO REACH IT THROUGH DOCUMENTED INTERFACES.  IN FACT, IT IS ALMOST
    GUARANTEED THAT IT WILL CHANGE OR DISAPPEAR IN A FUTURE GMP RELEASE.
 
-Copyright 2009, 2012 Free Software Foundation, Inc.
+Copyright 2009, 2012, 2013 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 3 of the License, or (at your
-option) any later version.
+it under the terms of either:
+
+  * the GNU Lesser General Public License as published by the Free
+    Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+
+or
+
+  * the GNU General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option) any
+    later version.
+
+or both in parallel, as here.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-License for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.  */
+You should have received copies of the GNU General Public License and the
+GNU Lesser General Public License along with the GNU MP Library.  If not,
+see https://www.gnu.org/licenses/.  */
 
 #include "gmp.h"
 #include "gmp-impl.h"
@@ -42,9 +53,10 @@ along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.  */
 
    FIXME: We currently allow any operand overlap.  This is quite non mpn-ish
    and might be changed, since it cost significant temporary space.
-   * If we require W to have space for un limbs, we could save qp or qp2 (but
-     we will still need to copy things into wp 50% of the time).
-   * If we allow ourselves to clobber U, we could save the other of qp and qp2.
+   * If we require W to have space for un + 1 limbs, we could save qp or qp2
+     (but we will still need to copy things into wp 50% of the time).
+   * If we allow ourselves to clobber U, we could save the other of qp and qp2,
+     and the initial COPY (but also here we would need un + 1 limbs).
 */
 
 /* FIXME: We need to wrap mpn_bdiv_qr due to the itch interface.  This need
@@ -89,7 +101,6 @@ mpn_remove (mp_ptr wp, mp_size_t *wn,
   tp = TMP_ALLOC_LIMBS ((un + 1 + vn) / 2); /* remainder */
   qp = TMP_ALLOC_LIMBS (un + 1);	/* quotient, alternating */
   qp2 = TMP_ALLOC_LIMBS (un + 1);	/* quotient, alternating */
-  np = TMP_ALLOC_LIMBS (un + LOG);	/* powers of V */
   pp = vp;
   pn = vn;
 
@@ -119,18 +130,20 @@ mpn_remove (mp_ptr wp, mp_size_t *wn,
       if (nn > qn)
 	break;			/* next power would be overlarge */
 
+      if (npowers == 1)		/* Alloc once, but only if it's needed */
+	np = TMP_ALLOC_LIMBS (qn + LOG);	/* powers of V */
+      else
+	np += pn;
+
       mpn_sqr (np, pp, pn);
-      nn += np[nn] != 0;
+      pn = nn + (np[nn] != 0);
       pp = np;
-      pn = nn;
-      np += nn;
     }
 
   pwr = ((mp_bitcnt_t) 1 << npowers) - 1;
 
   for (i = npowers - 1; i >= 0; i--)
     {
-      pp = pwpsp[i];
       pn = pwpsn[i];
       if (qn < pn)
 	continue;
@@ -139,7 +152,7 @@ mpn_remove (mp_ptr wp, mp_size_t *wn,
 	continue;		/* V^i would bring us past cap */
 
       qp[qn] = 0;
-      mpn_bdiv_qr_wrap (qp2, tp, qp, qn + 1, pp, pn);
+      mpn_bdiv_qr_wrap (qp2, tp, qp, qn + 1, pwpsp[i], pn);
       if (!mpn_zero_p (tp, pn))
 	continue;		/* could not divide by V^i */
 

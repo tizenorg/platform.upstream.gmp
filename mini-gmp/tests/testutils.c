@@ -1,6 +1,6 @@
 /*
 
-Copyright 2013, Free Software Foundation, Inc.
+Copyright 2013, 2014, Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
+the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include "testutils.h"
 
@@ -150,4 +150,24 @@ testhalves (int count, void (*tested_fun) (int))
   mp_set_memory_functions (NULL, NULL, NULL);
   (*tested_fun) (count / 2);
   mp_set_memory_functions (allocfunc, reallocfunc, freefunc);
+}
+
+void
+dump (const char *label, const mpz_t x)
+{
+  char *buf = mpz_get_str (NULL, 16, x);
+  fprintf (stderr, "%s: %s\n", label, buf);
+  testfree (buf);
+}
+
+void
+mpz_set_str_or_abort (mpz_ptr z, const char *str, int base)
+{
+  if (mpz_set_str (z, str, base) != 0)
+    {
+      fprintf (stderr, "ERROR: mpz_set_str failed\n");
+      fprintf (stderr, "   str  = \"%s\"\n", str);
+      fprintf (stderr, "   base = %d\n", base);
+      abort();
+    }
 }

@@ -15,8 +15,7 @@
 
 @SET_MAKE@
 
-# Copyright 1996, 1997, 1999, 2000, 2001, 2002, 2003, 2009, 2012 Free Software
-# Foundation, Inc.
+# Copyright 1996, 1997, 1999-2003, 2009, 2012 Free Software Foundation, Inc.
 #
 # This file is part of the GNU MP Library test suite.
 #
@@ -31,7 +30,7 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along with
-# the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.
+# the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -88,7 +87,7 @@ check_PROGRAMS = t-addsub$(EXEEXT) t-cmp$(EXEEXT) t-mul$(EXEEXT) \
 	t-hamdist$(EXEEXT) t-oddeven$(EXEEXT) t-popcount$(EXEEXT) \
 	t-set_f$(EXEEXT) t-io_raw$(EXEEXT) t-import$(EXEEXT) \
 	t-export$(EXEEXT) t-pprime_p$(EXEEXT) t-nextprime$(EXEEXT) \
-	t-remove$(EXEEXT)
+	t-remove$(EXEEXT) t-limbs$(EXEEXT)
 subdir = tests/mpz
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -285,6 +284,11 @@ t_lcm_OBJECTS = t-lcm.$(OBJEXT)
 t_lcm_LDADD = $(LDADD)
 t_lcm_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libgmp.la
+t_limbs_SOURCES = t-limbs.c
+t_limbs_OBJECTS = t-limbs.$(OBJEXT)
+t_limbs_LDADD = $(LDADD)
+t_limbs_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libgmp.la
 t_lucnum_ui_SOURCES = t-lucnum_ui.c
 t_lucnum_ui_OBJECTS = t-lucnum_ui.$(OBJEXT)
 t_lucnum_ui_LDADD = $(LDADD)
@@ -428,7 +432,7 @@ SOURCES = bit.c convert.c dive.c dive_ui.c io.c logic.c reuse.c \
 	t-divis_2exp.c t-export.c t-fac_ui.c t-fdiv.c t-fdiv_ui.c \
 	t-fib_ui.c t-fits.c t-gcd.c t-gcd_ui.c t-get_d.c \
 	t-get_d_2exp.c t-get_si.c t-hamdist.c t-import.c t-inp_str.c \
-	t-invert.c t-io_raw.c t-jac.c t-lcm.c t-lucnum_ui.c \
+	t-invert.c t-io_raw.c t-jac.c t-lcm.c t-limbs.c t-lucnum_ui.c \
 	t-mfac_uiui.c t-mul.c t-mul_i.c t-nextprime.c t-oddeven.c \
 	t-perfpow.c t-perfsqr.c t-popcount.c t-pow.c t-powm.c \
 	t-powm_ui.c t-pprime_p.c t-primorial_ui.c t-remove.c t-root.c \
@@ -440,7 +444,7 @@ DIST_SOURCES = bit.c convert.c dive.c dive_ui.c io.c logic.c reuse.c \
 	t-divis_2exp.c t-export.c t-fac_ui.c t-fdiv.c t-fdiv_ui.c \
 	t-fib_ui.c t-fits.c t-gcd.c t-gcd_ui.c t-get_d.c \
 	t-get_d_2exp.c t-get_si.c t-hamdist.c t-import.c t-inp_str.c \
-	t-invert.c t-io_raw.c t-jac.c t-lcm.c t-lucnum_ui.c \
+	t-invert.c t-io_raw.c t-jac.c t-lcm.c t-limbs.c t-lucnum_ui.c \
 	t-mfac_uiui.c t-mul.c t-mul_i.c t-nextprime.c t-oddeven.c \
 	t-perfpow.c t-perfsqr.c t-popcount.c t-pow.c t-powm.c \
 	t-powm_ui.c t-pprime_p.c t-primorial_ui.c t-remove.c t-root.c \
@@ -777,6 +781,9 @@ t-jac$(EXEEXT): $(t_jac_OBJECTS) $(t_jac_DEPENDENCIES) $(EXTRA_t_jac_DEPENDENCIE
 t-lcm$(EXEEXT): $(t_lcm_OBJECTS) $(t_lcm_DEPENDENCIES) $(EXTRA_t_lcm_DEPENDENCIES) 
 	@rm -f t-lcm$(EXEEXT)
 	$(LINK) $(t_lcm_OBJECTS) $(t_lcm_LDADD) $(LIBS)
+t-limbs$(EXEEXT): $(t_limbs_OBJECTS) $(t_limbs_DEPENDENCIES) $(EXTRA_t_limbs_DEPENDENCIES) 
+	@rm -f t-limbs$(EXEEXT)
+	$(LINK) $(t_limbs_OBJECTS) $(t_limbs_LDADD) $(LIBS)
 t-lucnum_ui$(EXEEXT): $(t_lucnum_ui_OBJECTS) $(t_lucnum_ui_DEPENDENCIES) $(EXTRA_t_lucnum_ui_DEPENDENCIES) 
 	@rm -f t-lucnum_ui$(EXEEXT)
 	$(LINK) $(t_lucnum_ui_OBJECTS) $(t_lucnum_ui_LDADD) $(LIBS)

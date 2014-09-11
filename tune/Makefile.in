@@ -15,41 +15,61 @@
 
 @SET_MAKE@
 
-# Copyright 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009,
-# 2010, 2011 Free Software Foundation, Inc.
+# Copyright 2000-2003, 2005-2011 Free Software Foundation, Inc.
 #
-# This file is part of the GNU MP Library.
+#  This file is part of the GNU MP Library.
 #
-# The GNU MP Library is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or (at your
-# option) any later version.
+#  The GNU MP Library is free software; you can redistribute it and/or modify
+#  it under the terms of either:
 #
-# The GNU MP Library is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-# License for more details.
+#    * the GNU Lesser General Public License as published by the Free
+#      Software Foundation; either version 3 of the License, or (at your
+#      option) any later version.
 #
-# You should have received a copy of the GNU Lesser General Public License
-# along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.
+#  or
+#
+#    * the GNU General Public License as published by the Free Software
+#      Foundation; either version 2 of the License, or (at your option) any
+#      later version.
+#
+#  or both in parallel, as here.
+#
+#  The GNU MP Library is distributed in the hope that it will be useful, but
+#  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#  for more details.
+#
+#  You should have received copies of the GNU General Public License and the
+#  GNU Lesser General Public License along with the GNU MP Library.  If not,
+#  see https://www.gnu.org/licenses/.
 
-# Copyright 1996, 1998, 1999, 2000, 2001, 2002 Free Software Foundation,
-# Inc.
+# Copyright 1996, 1998-2002 Free Software Foundation, Inc.
 #
-# This file is part of the GNU MP Library.
+#  This file is part of the GNU MP Library.
 #
-# The GNU MP Library is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or (at your
-# option) any later version.
+#  The GNU MP Library is free software; you can redistribute it and/or modify
+#  it under the terms of either:
 #
-# The GNU MP Library is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-# License for more details.
+#    * the GNU Lesser General Public License as published by the Free
+#      Software Foundation; either version 3 of the License, or (at your
+#      option) any later version.
 #
-# You should have received a copy of the GNU Lesser General Public License
-# along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.
+#  or
+#
+#    * the GNU General Public License as published by the Free Software
+#      Foundation; either version 2 of the License, or (at your option) any
+#      later version.
+#
+#  or both in parallel, as here.
+#
+#  The GNU MP Library is distributed in the hope that it will be useful, but
+#  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#  for more details.
+#
+#  You should have received copies of the GNU General Public License and the
+#  GNU Lesser General Public License along with the GNU MP Library.  If not,
+#  see https://www.gnu.org/licenses/.
 
 VPATH = @srcdir@
 am__make_dryrun = \
@@ -105,7 +125,8 @@ am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) \
 	$(top_builddir)/tests/libtests.la $(top_builddir)/libgmp.la
 am_libspeed_la_OBJECTS = common.lo divrem1div.lo divrem1inv.lo \
-	divrem2div.lo divrem2inv.lo freq.lo gcdext_single.lo \
+	divrem2div.lo divrem2inv.lo div_qr_1n_pi1_1.lo \
+	div_qr_1n_pi1_2.lo div_qr_1_tune.lo freq.lo gcdext_single.lo \
 	gcdext_double.lo gcdextod.lo gcdextos.lo hgcd_lehmer.lo \
 	hgcd_appr_lehmer.lo hgcd_reduce_1.lo hgcd_reduce_2.lo \
 	jacbase1.lo jacbase2.lo jacbase3.lo jacbase4.lo mod_1_div.lo \
@@ -148,7 +169,7 @@ am__objects_1 = div_qr_2.$(OBJEXT) bdiv_q.$(OBJEXT) bdiv_qr.$(OBJEXT) \
 	divrem_2.$(OBJEXT) gcd.$(OBJEXT) gcdext.$(OBJEXT) \
 	get_str.$(OBJEXT) set_str.$(OBJEXT) matrix22_mul.$(OBJEXT) \
 	hgcd.$(OBJEXT) hgcd_appr.$(OBJEXT) hgcd_reduce.$(OBJEXT) \
-	mul_n.$(OBJEXT) sqr.$(OBJEXT) powm_sec.$(OBJEXT) \
+	mul_n.$(OBJEXT) sqr.$(OBJEXT) sec_powm.$(OBJEXT) \
 	mullo_n.$(OBJEXT) mul_fft.$(OBJEXT) mul.$(OBJEXT) \
 	tdiv_qr.$(OBJEXT) mulmod_bnm1.$(OBJEXT) sqrmod_bnm1.$(OBJEXT) \
 	mulmid.$(OBJEXT) mulmid_n.$(OBJEXT) toom42_mulmid.$(OBJEXT) \
@@ -368,6 +389,7 @@ noinst_HEADERS = speed.h
 EXTRA_LTLIBRARIES = libspeed.la
 libspeed_la_SOURCES = \
   common.c divrem1div.c divrem1inv.c divrem2div.c divrem2inv.c		\
+  div_qr_1n_pi1_1.c div_qr_1n_pi1_2.c div_qr_1_tune.c			\
   freq.c								\
   gcdext_single.c gcdext_double.c gcdextod.c gcdextos.c			\
   hgcd_lehmer.c hgcd_appr_lehmer.c hgcd_reduce_1.c hgcd_reduce_2.c	\
@@ -429,7 +451,7 @@ TUNE_MPN_SRCS_BASIC = div_qr_2.c bdiv_q.c bdiv_qr.c			\
   invertappr.c invert.c binvert.c divrem_2.c gcd.c gcdext.c		\
   get_str.c set_str.c matrix22_mul.c					\
   hgcd.c hgcd_appr.c hgcd_reduce.c					\
-  mul_n.c sqr.c powm_sec.c						\
+  mul_n.c sqr.c sec_powm.c						\
   mullo_n.c mul_fft.c mul.c tdiv_qr.c mulmod_bnm1.c sqrmod_bnm1.c	\
   mulmid.c mulmid_n.c toom42_mulmid.c					\
   nussbaumer_mul.c toom6h_mul.c toom8h_mul.c toom6_sqr.c toom8_sqr.c	\

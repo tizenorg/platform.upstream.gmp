@@ -3,8 +3,7 @@
    THIS IS A TEST PROGRAM USED ONLY FOR DEVELOPMENT.  IT'S ALMOST CERTAIN TO
    BE SUBJECT TO INCOMPATIBLE CHANGES IN FUTURE VERSIONS OF GMP.
 
-Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011, 2012
-Free Software Foundation, Inc.
+Copyright 2000-2006, 2008, 2009, 2011, 2012 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -19,7 +18,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
+the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 
 /* Usage: try [options] <function>...
@@ -211,11 +210,11 @@ int  option_data = DATA_TRAND;
 
 
 mp_size_t  pagesize;
-#define PAGESIZE_LIMBS  (pagesize / BYTES_PER_MP_LIMB)
+#define PAGESIZE_LIMBS  (pagesize / GMP_LIMB_BYTES)
 
 /* must be a multiple of the page size */
 #define REDZONE_BYTES   (pagesize * 16)
-#define REDZONE_LIMBS   (REDZONE_BYTES / BYTES_PER_MP_LIMB)
+#define REDZONE_LIMBS   (REDZONE_BYTES / GMP_LIMB_BYTES)
 
 
 #define MAX3(x,y,z)   (MAX (x, MAX (y, z)))
@@ -362,6 +361,7 @@ struct try_t {
 #define DATA_SRC1_HIGHBIT     7
 #define DATA_MULTIPLE_DIVISOR 8
 #define DATA_UDIV_QRNND       9
+#define DATA_DIV_QR_1        10
   char  data;
 
 /* Default is allow full overlap. */
@@ -540,6 +540,40 @@ validate_modexact_1_odd (void)
   validate_modexact_1c_odd ();
 }
 
+void
+validate_div_qr_1_pi1 (void)
+{
+  mp_srcptr up = ref.s[0].p;
+  mp_size_t un = size;
+  mp_size_t uh = ref.s[1].p[0];
+  mp_srcptr qp = fun.d[0].p;
+  mp_limb_t r = fun.retval;
+  mp_limb_t cy;
+  int cmp;
+  mp_ptr tp;
+  if (r >= divisor)
+    {
+      gmp_printf ("Bad remainder %Md, d = %Md\n", r, divisor);
+      validate_fail ();
+    }
+  tp = refmpn_malloc_limbs (un);
+  cy = refmpn_mul_1 (tp, qp, un, divisor);
+  cy += refmpn_add_1 (tp, tp, un, r);
+  if (cy != uh || refmpn_cmp (tp, up, un) != 0)
+    {
+      gmp_printf ("Incorrect result, size %ld.\n"
+		  "d = %Mx, u = %Mx, %Nx\n"
+		  "got: r = %Mx, q = %Nx\n"
+		  "q d + r = %Mx, %Nx",
+		  (long) un,
+		  divisor, uh, up, un,
+		  r, qp, un,
+		  cy, tp, un);
+      validate_fail ();
+    }
+  free (tp);
+}
+
 
 void
 validate_sqrtrem (void)
@@ -626,6 +660,7 @@ enum {
 
   TYPE_MOD_1, TYPE_MOD_1C, TYPE_DIVMOD_1, TYPE_DIVMOD_1C, TYPE_DIVREM_1,
   TYPE_DIVREM_1C, TYPE_PREINV_DIVREM_1, TYPE_DIVREM_2, TYPE_PREINV_MOD_1,
+  TYPE_DIV_QR_1N_PI1,
   TYPE_MOD_34LSUB1, TYPE_UDIV_QRNND, TYPE_UDIV_QRNND_R,
 
   TYPE_DIVEXACT_1, TYPE_BDIV_Q_1, TYPE_DIVEXACT_BY3, TYPE_DIVEXACT_BY3C,
@@ -747,12 +782,12 @@ param_init (void)
   p = &param[TYPE_ADDCND_N];
   COPY (TYPE_ADD_N);
   p->carry = CARRY_BIT;
-  REFERENCE (refmpn_addcnd_n);
+  REFERENCE (refmpn_cnd_add_n);
 
   p = &param[TYPE_SUBCND_N];
   COPY (TYPE_ADD_N);
   p->carry = CARRY_BIT;
-  REFERENCE (refmpn_subcnd_n);
+  REFERENCE (refmpn_cnd_sub_n);
 
 
   p = &param[TYPE_MUL_1];
@@ -1106,6 +1141,17 @@ param_init (void)
   COPY (TYPE_DIVREM_1);
   p->size = SIZE_YES; /* ie. no size==0 */
   REFERENCE (refmpn_preinv_divrem_1);
+
+  p = &param[TYPE_DIV_QR_1N_PI1];
+  p->retval = 1;
+  p->src[0] = 1;
+  p->src[1] = 1;
+  /* SIZE_1 not supported. Always uses low limb only. */
+  p->size2 = 1;
+  p->dst[0] = 1;
+  p->divisor = DIVISOR_NORM;
+  p->data = DATA_DIV_QR_1;
+  VALIDATE (validate_div_qr_1_pi1);
 
   p = &param[TYPE_PREINV_MOD_1];
   p->retval = 1;
@@ -1716,12 +1762,12 @@ const struct choice_t choice_array[] = {
   { TRY(mpn_copyd), TYPE_COPYD },
 #endif
 
-  { TRY(mpn_addcnd_n), TYPE_ADDCND_N },
-  { TRY(mpn_subcnd_n), TYPE_SUBCND_N },
-#if HAVE_NATIVE_mpn_addlsh1_n
+  { TRY(mpn_cnd_add_n), TYPE_ADDCND_N },
+  { TRY(mpn_cnd_sub_n), TYPE_SUBCND_N },
+#if HAVE_NATIVE_mpn_addlsh1_n == 1
   { TRY(mpn_addlsh1_n), TYPE_ADDLSH1_N },
 #endif
-#if HAVE_NATIVE_mpn_addlsh2_n
+#if HAVE_NATIVE_mpn_addlsh2_n == 1
   { TRY(mpn_addlsh2_n), TYPE_ADDLSH2_N },
 #endif
 #if HAVE_NATIVE_mpn_addlsh_n
@@ -1745,10 +1791,10 @@ const struct choice_t choice_array[] = {
 #if HAVE_NATIVE_mpn_addlsh_n_ip2
   { TRY_FUNFUN(mpn_addlsh_n_ip2), TYPE_ADDLSH_N_IP2 },
 #endif
-#if HAVE_NATIVE_mpn_sublsh1_n
+#if HAVE_NATIVE_mpn_sublsh1_n == 1
   { TRY(mpn_sublsh1_n), TYPE_SUBLSH1_N },
 #endif
-#if HAVE_NATIVE_mpn_sublsh2_n
+#if HAVE_NATIVE_mpn_sublsh2_n == 1
   { TRY(mpn_sublsh2_n), TYPE_SUBLSH2_N },
 #endif
 #if HAVE_NATIVE_mpn_sublsh_n
@@ -1763,10 +1809,10 @@ const struct choice_t choice_array[] = {
 #if HAVE_NATIVE_mpn_sublsh_n_ip1
   { TRY_FUNFUN(mpn_sublsh_n_ip1), TYPE_SUBLSH_N_IP1 },
 #endif
-#if HAVE_NATIVE_mpn_rsblsh1_n
+#if HAVE_NATIVE_mpn_rsblsh1_n == 1
   { TRY(mpn_rsblsh1_n), TYPE_RSBLSH1_N },
 #endif
-#if HAVE_NATIVE_mpn_rsblsh2_n
+#if HAVE_NATIVE_mpn_rsblsh2_n == 1
   { TRY(mpn_rsblsh2_n), TYPE_RSBLSH2_N },
 #endif
 #if HAVE_NATIVE_mpn_rsblsh_n
@@ -1830,6 +1876,7 @@ const struct choice_t choice_array[] = {
 #if HAVE_NATIVE_mpn_mod_1c
   { TRY(mpn_mod_1c),       TYPE_MOD_1C },
 #endif
+  { TRY(mpn_div_qr_1n_pi1), TYPE_DIV_QR_1N_PI1 },
 #if GMP_NUMB_BITS % 4 == 0
   { TRY(mpn_mod_34lsub1),  TYPE_MOD_34LSUB1 },
 #endif
@@ -1993,12 +2040,12 @@ malloc_region (struct region_t *r, mp_size_t n)
   mp_ptr  p;
   size_t  nbytes;
 
-  ASSERT ((pagesize % BYTES_PER_MP_LIMB) == 0);
+  ASSERT ((pagesize % GMP_LIMB_BYTES) == 0);
 
   n = round_up_multiple (n, PAGESIZE_LIMBS);
   r->size = n;
 
-  nbytes = n*BYTES_PER_MP_LIMB + 2*REDZONE_BYTES + pagesize;
+  nbytes = n*GMP_LIMB_BYTES + 2*REDZONE_BYTES + pagesize;
 
 #if defined (MAP_ANONYMOUS) && ! defined (MAP_ANON)
 #define MAP_ANON  MAP_ANONYMOUS
@@ -2409,10 +2456,13 @@ call (struct each_t *e, tryfun_t function)
   case TYPE_RSBLSH2_NC:
   case TYPE_ADD_NC:
   case TYPE_SUB_NC:
+    e->retval = CALLING_CONVENTIONS (function)
+      (e->d[0].p, e->s[0].p, e->s[1].p, size, carry);
+    break;
   case TYPE_ADDCND_N:
   case TYPE_SUBCND_N:
     e->retval = CALLING_CONVENTIONS (function)
-      (e->d[0].p, e->s[0].p, e->s[1].p, size, carry);
+      (carry, e->d[0].p, e->s[0].p, e->s[1].p, size);
     break;
   case TYPE_ADD_ERR1_N:
   case TYPE_SUB_ERR1_N:
@@ -2551,6 +2601,14 @@ call (struct each_t *e, tryfun_t function)
     e->retval = CALLING_CONVENTIONS (function)
       (e->s[0].p, size, divisor, refmpn_invert_limb (divisor));
     break;
+  case TYPE_DIV_QR_1N_PI1:
+    {
+      mp_limb_t dinv = refmpn_invert_limb (divisor);
+      e->retval = CALLING_CONVENTIONS (function)
+	(e->d[0].p, e->s[0].p, size, e->s[1].p[0], divisor, dinv);
+      break;
+    }
+
   case TYPE_MOD_34LSUB1:
     e->retval = CALLING_CONVENTIONS (function) (e->s[0].p, size);
     break;
@@ -3075,6 +3133,10 @@ try_one (void)
       case DATA_UDIV_QRNND:
 	s[i].p[1] %= divisor;
 	break;
+      case DATA_DIV_QR_1:
+	if (i == 1)
+	  s[i].p[0] %= divisor;
+	break;
       }
 
       mprotect_region (&s[i].region, PROT_READ);
@@ -3336,7 +3398,7 @@ Error, error, cannot get page size
 	printf ("s[%d] %p to %p (0x%lX bytes)\n",
 		i, (void *) (s[i].region.ptr),
 		(void *) (s[i].region.ptr + s[i].region.size),
-		(long) s[i].region.size * BYTES_PER_MP_LIMB);
+		(long) s[i].region.size * GMP_LIMB_BYTES);
       }
 
 #define INIT_EACH(e,es)                                                 \
@@ -3346,7 +3408,7 @@ Error, error, cannot get page size
 	printf ("%s d[%d] %p to %p (0x%lX bytes)\n",                    \
 		es, i, (void *) (e.d[i].region.ptr),			\
 		(void *)  (e.d[i].region.ptr + e.d[i].region.size),	\
-		(long) e.d[i].region.size * BYTES_PER_MP_LIMB);         \
+		(long) e.d[i].region.size * GMP_LIMB_BYTES);         \
       }
 
     INIT_EACH(ref, "ref");

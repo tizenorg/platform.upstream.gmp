@@ -1,23 +1,34 @@
 dnl  ARM v6 mpn_sqr_basecase.
 
-dnl  Contributed to the GNU project by Torbjorn Granlund.
+dnl  Contributed to the GNU project by Torbjörn Granlund.
 
-dnl  Copyright 2012 Free Software Foundation, Inc.
+dnl  Copyright 2012, 2013 Free Software Foundation, Inc.
 
 dnl  This file is part of the GNU MP Library.
-
+dnl
 dnl  The GNU MP Library is free software; you can redistribute it and/or modify
-dnl  it under the terms of the GNU Lesser General Public License as published
-dnl  by the Free Software Foundation; either version 3 of the License, or (at
-dnl  your option) any later version.
-
+dnl  it under the terms of either:
+dnl
+dnl    * the GNU Lesser General Public License as published by the Free
+dnl      Software Foundation; either version 3 of the License, or (at your
+dnl      option) any later version.
+dnl
+dnl  or
+dnl
+dnl    * the GNU General Public License as published by the Free Software
+dnl      Foundation; either version 2 of the License, or (at your option) any
+dnl      later version.
+dnl
+dnl  or both in parallel, as here.
+dnl
 dnl  The GNU MP Library is distributed in the hope that it will be useful, but
 dnl  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-dnl  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-dnl  License for more details.
-
-dnl  You should have received a copy of the GNU Lesser General Public License
-dnl  along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.
+dnl  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+dnl  for more details.
+dnl
+dnl  You should have received copies of the GNU General Public License and the
+dnl  GNU Lesser General Public License along with the GNU MP Library.  If not,
+dnl  see https://www.gnu.org/licenses/.
 
 include(`../config.m4')
 
@@ -52,7 +63,7 @@ C  * Optimise sqr_diag_addlsh1 loop.  (This could save O(n) cycles.)
 C  * Implement larger final corners (xit/tix).  Also stop loops earlier
 C    suppressing writes of upper-most rp[] values.  (This could save 10-20
 C    cycles for n > 4.)
-C  * Is the branch really faster than discrete branches?
+C  * Is the branch table really faster than discrete branches?
 
 define(`rp',      r0)
 define(`up',      r1)
@@ -396,6 +407,7 @@ L(sqr_diag_addlsh1):
 	ldr	r3, [up], #4
 	umull	w1, r5, r3, r3
 	mov	w2, #0
+	mov	r10, #0
 C	cmn	r0, #0			C clear cy (already clear by luck)
 	b	L(lm)
 
@@ -409,8 +421,7 @@ L(lm):	ldr	w0, [rp, #4]
 	adcs	w0, w0, w0
 	ldr	r3, [up], #4
 	adcs	w1, w1, w1
-	mov	w2, #0
-	adc	w2, w2, w2
+	adc	w2, r10, r10
 	umull	r4, r5, r3, r3
 	subs	n, n, #1
 	bne	L(tsd)

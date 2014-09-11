@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 
-# Copyright 2000, 2001, 2002 Free Software Foundation, Inc.
+# Copyright 2000-2002 Free Software Foundation, Inc.
 #
 # This file is part of the GNU MP Library test suite.
 #
@@ -15,7 +15,7 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along with
-# the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.
+# the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.
 
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/tests

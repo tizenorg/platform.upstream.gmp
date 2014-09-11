@@ -6,8 +6,7 @@
 	mpz_mul_si
 	mpz_addmul_ui (should this really allow a+=a*c?)
 
-Copyright 1996, 1999, 2000, 2001, 2002, 2009, 2012, 2013 Free Software
-Foundation, Inc.
+Copyright 1996, 1999-2002, 2009, 2012, 2013 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library test suite.
 
@@ -22,7 +21,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
+the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -469,7 +468,7 @@ main (int argc, char **argv)
 	    FAIL2 (mpz_rootrem, in1, in2, NULL);
 	}
 
-      if (size_range < 18)	/* run fewer tests since gcdext lots of time */
+      if (size_range < 18)	/* run fewer tests since gcdext is slow */
 	{
 	  mpz_gcdext (ref1, ref2, ref3, in1, in2);
 	  MPZ_CHECK_FORMAT (ref1);

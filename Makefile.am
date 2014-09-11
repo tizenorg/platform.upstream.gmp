@@ -1,23 +1,34 @@
 ## Process this file with automake to generate Makefile.in
 
 
-# Copyright 1991, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2006, 2007, 2008, 2009, 2011, 2012, 2013 Free Software Foundation, Inc.
+# Copyright 1991, 1993, 1994, 1996, 1997, 1999-2004, 2006-2009, 2011-2014 Free
+# Software Foundation, Inc.
 #
-# This file is part of the GNU MP Library.
+#  This file is part of the GNU MP Library.
 #
-# The GNU MP Library is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or (at your
-# option) any later version.
+#  The GNU MP Library is free software; you can redistribute it and/or modify
+#  it under the terms of either:
 #
-# The GNU MP Library is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-# License for more details.
+#    * the GNU Lesser General Public License as published by the Free
+#      Software Foundation; either version 3 of the License, or (at your
+#      option) any later version.
 #
-# You should have received a copy of the GNU Lesser General Public License
-# along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.
+#  or
+#
+#    * the GNU General Public License as published by the Free Software
+#      Foundation; either version 2 of the License, or (at your option) any
+#      later version.
+#
+#  or both in parallel, as here.
+#
+#  The GNU MP Library is distributed in the hope that it will be useful, but
+#  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#  for more details.
+#
+#  You should have received copies of the GNU General Public License and the
+#  GNU Lesser General Public License along with the GNU MP Library.  If not,
+#  see https://www.gnu.org/licenses/.
 
 
 # The following options are the same as AM_INIT_AUTOMAKE in configure.in,
@@ -74,7 +85,7 @@
 #        5.1.0   11:0:1    7:0:3     -
 #        5.1.1   11:1:1    7:1:3     -
 #        5.1.2   11:2:1    7:2:3     -
-#        5.1.3   11:3:1    7:3:3     -
+#        6.0.0   12:0:2    8:0:4     -
 #
 # Starting at 3:0:0 is a slight abuse of the versioning system, but it
 # ensures we're past soname libgmp.so.2, which was used on Debian GNU/Linux
@@ -87,18 +98,20 @@
 # it's still good to get the shared library filename (like
 # libgmpxx.so.3.0.4) incrementing, to make it clear which GMP it's from.
 
-LIBGMP_LT_CURRENT    = 11
-LIBGMP_LT_REVISION   = 3
-LIBGMP_LT_AGE        = 1
+LIBGMP_LT_CURRENT    = 12
+LIBGMP_LT_REVISION   = 0
+LIBGMP_LT_AGE        = 2
 
-LIBGMPXX_LT_CURRENT  = 7
-LIBGMPXX_LT_REVISION = 3
-LIBGMPXX_LT_AGE      = 3
+LIBGMPXX_LT_CURRENT  = 8
+LIBGMPXX_LT_REVISION = 0
+LIBGMPXX_LT_AGE      = 4
 
 
 SUBDIRS = tests mpn mpz mpq mpf printf scanf rand cxx demos tune doc
 
-EXTRA_DIST = configfsf.guess configfsf.sub .gdbinit INSTALL.autoconf
+EXTRA_DIST = configfsf.guess configfsf.sub .gdbinit INSTALL.autoconf \
+	     COPYING.LESSERv3 COPYINGv2 COPYINGv3
+
 
 if WANT_CXX
 GMPXX_HEADERS_OPTION = gmpxx.h
@@ -176,7 +189,9 @@ MPZ_OBJECTS = mpz/abs$U.lo mpz/add$U.lo mpz/add_ui$U.lo			\
   mpz/ior$U.lo mpz/iset$U.lo mpz/iset_d$U.lo mpz/iset_si$U.lo		\
   mpz/iset_str$U.lo mpz/iset_ui$U.lo mpz/jacobi$U.lo mpz/kronsz$U.lo	\
   mpz/kronuz$U.lo mpz/kronzs$U.lo mpz/kronzu$U.lo			\
-  mpz/lcm$U.lo mpz/lcm_ui$U.lo mpz/lucnum_ui$U.lo mpz/lucnum2_ui$U.lo	\
+  mpz/lcm$U.lo mpz/lcm_ui$U.lo mpz/limbs_finish$U.lo			\
+  mpz/limbs_modify$U.lo mpz/limbs_read$U.lo mpz/limbs_write$U.lo	\
+  mpz/lucnum_ui$U.lo mpz/lucnum2_ui$U.lo				\
   mpz/millerrabin$U.lo mpz/mod$U.lo mpz/mul$U.lo mpz/mul_2exp$U.lo	\
   mpz/mul_si$U.lo mpz/mul_ui$U.lo					\
   mpz/n_pow_ui$U.lo mpz/neg$U.lo mpz/nextprime$U.lo			\
@@ -184,7 +199,7 @@ MPZ_OBJECTS = mpz/abs$U.lo mpz/add$U.lo mpz/add_ui$U.lo			\
   mpz/popcount$U.lo mpz/pow_ui$U.lo mpz/powm$U.lo mpz/powm_sec$U.lo	\
   mpz/powm_ui$U.lo mpz/primorial_ui$U.lo				\
   mpz/pprime_p$U.lo mpz/random$U.lo mpz/random2$U.lo			\
-  mpz/realloc$U.lo mpz/realloc2$U.lo mpz/remove$U.lo			\
+  mpz/realloc$U.lo mpz/realloc2$U.lo mpz/remove$U.lo mpz/roinit_n$U.lo  \
   mpz/root$U.lo mpz/rootrem$U.lo mpz/rrandomb$U.lo mpz/scan0$U.lo	\
   mpz/scan1$U.lo mpz/set$U.lo mpz/set_d$U.lo mpz/set_f$U.lo		\
   mpz/set_q$U.lo mpz/set_si$U.lo mpz/set_str$U.lo mpz/set_ui$U.lo	\

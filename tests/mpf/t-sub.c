@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see http://www.gnu.org/licenses/.  */
+the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -179,7 +179,7 @@ check_data (void)
 
           if (mpf_cmp (got, want) != 0)
             {
-              printf ("check_data() wrong reault at data[%d] (operands%s swapped)\n", i, swap ? "" : " not");
+              printf ("check_data() wrong result at data[%d] (operands%s swapped)\n", i, swap ? "" : " not");
               mpf_trace ("x   ", x);
               mpf_trace ("y   ", y);
               mpf_trace ("got ", got);

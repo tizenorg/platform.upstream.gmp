@@ -1,32 +1,23 @@
 /* mpq expression evaluation
 
-Copyright 2000-2002 Free Software Foundation, Inc.
+Copyright 2000, 2001, 2002 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include <stdio.h>
 #include <string.h>
@@ -83,11 +74,11 @@ e_mpq_den (mpq_ptr w, mpq_srcptr x)
 }
 
 
-static const struct mpexpr_operator_t  _mpq_expr_standard_table[] = {
+static __gmp_const struct mpexpr_operator_t  _mpq_expr_standard_table[] = {
 
   { "**",  (mpexpr_fun_t) e_mpq_pow_ui,
     MPEXPR_TYPE_BINARY_UI | MPEXPR_TYPE_RIGHTASSOC,                   220 },
-
+  
   { "!",   (mpexpr_fun_t) e_mpq_sgn,
     MPEXPR_TYPE_LOGICAL_NOT | MPEXPR_TYPE_PREFIX,                     210 },
   { "-",   (mpexpr_fun_t) mpq_neg,
@@ -132,17 +123,32 @@ static const struct mpexpr_operator_t  _mpq_expr_standard_table[] = {
   { NULL }
 };
 
-const struct mpexpr_operator_t * const mpq_expr_standard_table
+__gmp_const struct mpexpr_operator_t * __gmp_const mpq_expr_standard_table
 = _mpq_expr_standard_table;
 
 
 int
-mpq_expr (mpq_ptr res, int base, const char *e, ...)
+#if HAVE_STDARG
+mpq_expr (mpq_ptr res, int base, __gmp_const char *e, ...)
+#else
+mpq_expr (va_alist)
+     va_dcl
+#endif
 {
   mpq_srcptr  var[MPEXPR_VARIABLES];
   va_list     ap;
   int         ret;
+#if HAVE_STDARG
   va_start (ap, e);
+#else
+  mpq_ptr           res;
+  int               base;
+  __gmp_const char  *e;
+  va_start (ap);
+  res  = va_arg (ap, mpq_ptr);
+  base = va_arg (ap, int);
+  e    = va_arg (ap, __gmp_const char *);
+#endif
 
   TRACE (printf ("mpq_expr(): base %d, %s\n", base, e));
   ret = mpexpr_va_to_var ((void **) var, ap);

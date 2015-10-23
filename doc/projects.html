@@ -4,7 +4,7 @@
   <title>GMP Development Projects</title>
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="stylesheet" href="gmp.css">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 
 <center>
@@ -14,58 +14,50 @@
 </center>
 
 <font size=-1>
-<pre>
-Copyright 2000-2006, 2008-2011 Free Software Foundation, Inc.
-
-This file is part of the GNU MP Library.
-
+Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation,
+Inc. <br><br>
+This file is part of the GNU MP Library. <br><br>
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
-
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation; either version 2.1 of the License, or (at
+your option) any later version. <br><br>
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.
-</pre>
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details. <br><br>
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
 </font>
 
 <hr>
 <!-- NB. timestamp updated automatically by emacs -->
-  This file current as of 29 Jan 2014.  An up-to-date version is available at
-  <a href="https://gmplib.org/projects.html">https://gmplib.org/projects.html</a>.
-  Please send comments about this page to gmp-devel<font>@</font>gmplib.org.
+  This file current as of 21 Apr 2006.  An up-to-date version is available at
+  <a href="http://swox.com/gmp/projects.html">http://swox.com/gmp/projects.html</a>.
+  Please send comments about this page to gmp-devel<font>@</font>swox.com.
 
 <p> This file lists projects suitable for volunteers.  Please see the
     <a href="tasks.html">tasks file</a> for smaller tasks.
 
 <p> If you want to work on any of the projects below, please let
-    gmp-devel<font>@</font>gmplib.org know.  If you want to help with a project
+    gmp-devel<font>@</font>swox.com know.  If you want to help with a project
     that already somebody else is working on, you will get in touch through
-    gmp-devel<font>@</font>gmplib.org.  (There are no email addresses of
+    gmp-devel<font>@</font>swox.com.  (There are no email addresses of
     volunteers below, due to spamming problems.)
 
 <ul>
 <li> <strong>Faster multiplication</strong>
 
+  <p> The current multiplication code uses Karatsuba, 3-way Toom, and Fermat
+      FFT.  Several new developments are desirable:
+
   <ol>
 
-    <li> Work on the algorithm selection code for unbalanced multiplication.
+    <li> Handle multiplication of operands with different digit count better
+	 than today.  We now split the operands in a very inefficient way, see
+	 mpn/generic/mul.c.  The best operands splitting strategy depends on
+	 the underlying multiplication algorithm to be used.
 
     <li> Implement an FFT variant computing the coefficients mod m different
 	 limb size primes of the form l*2^k+1. i.e., compute m separate FFTs.
@@ -81,11 +73,22 @@ see https://www.gnu.org/licenses/.
 	 in having to do more FFTs, but that is a slight total save.  We then
 	 lose in more expensive CRT. <br><br>
 
-	 <p> [We now have two implementations of this algorithm, one by Tommy
-	 FÃ¤rnqvist and one by Niels MÃ¶ller.]
+         An nearly complete implementation has been done by Tommy Färnqvist.
 
-    <li> Work on short products.  Our mullo and mulmid are probably K, but we
-         lack mulhi.
+    <li> Perhaps consider N-way Toom, N > 3.  See Knuth's Seminumerical
+	 Algorithms for details on the method.  Code implementing it exists.
+	 This is asymptotically inferior to FFTs, but is finer grained.  A
+	 Toom-4 might fit in between Toom-3 and the FFTs (or it might not).
+
+    <li> Add support for partial products, either a given number of low limbs
+         or high limbs of the result.  A high partial product can be used by
+         <code>mpf_mul</code> and by Newton approximations, a low half partial
+         product might be of use in a future sub-quadratic REDC.  On small
+         sizes a partial product will be faster simply through fewer
+         cross-products, similar to the way squaring is faster.  But work by
+         Thom Mulders shows that for Karatsuba and higher order algorithms the
+         advantage is progressively lost, so for large sizes partial products
+         turn out to be no faster.
 
   </ol>
 
@@ -105,9 +108,9 @@ see https://www.gnu.org/licenses/.
 
   <p> Please make sure your new routines are fast for these three situations:
       <ol>
-	<li> Small operands of less than, say, 10 limbs.
-	<li> Medium size operands, that fit into the cache.
-	<li> Huge operands that does not fit into the cache.
+        <li> Operands that fit into the cache.
+        <li> Small operands of less than, say, 10 limbs.
+        <li> Huge operands that does not fit into the cache.
       </ol>
 
   <p> The most important routines are mpn_addmul_1, mpn_mul_basecase and
@@ -116,60 +119,112 @@ see https://www.gnu.org/licenses/.
 
   <p> Standard techniques for these routines are unrolling, software
       pipelining, and specialization for common operand values.  For machines
-      with poor integer multiplication, it is sometimes possible to remedy the
-      situation using floating-point operations or SIMD operations such as MMX
-      (x86) (x86), SSE (x86), VMX (PowerPC), VIS (Sparc).
+      with poor integer multiplication, it is often possible to improve the
+      performance using floating-point operations, or SIMD operations such as
+      MMX or Sun's VIS.
 
   <p> Using floating-point operations is interesting but somewhat tricky.
       Since IEEE double has 53 bit of mantissa, one has to split the operands
-      in small pieces, so that no intermediates are greater than 2^53.  For
-      32-bit computers, splitting one operand into 16-bit pieces works.  For
-      64-bit machines, one operand can be split into 21-bit pieces and the
-      other into 32-bit pieces.  (A 64-bit operand can be split into just three
-      21-bit pieces if one allows the split operands to be negative!)
+      in small prices, so that no result is greater than 2^53.  For 32-bit
+      computers, splitting one operand into 16-bit pieces works.  For 64-bit
+      machines, one operand can be split into 21-bit pieces and the other into
+      32-bit pieces.  (A 64-bit operand can be split into just three 21-bit
+      pieces if one allows the split operands to be negative!)
+
+
+<li> <strong>Faster GCD</strong>
+
+  <p> Work on Schönhage GCD and GCDEXT for large numbers is in progress.
+      Contact Niels Möller if you want to help.
+
+
+<li> <strong>Math functions for the mpf layer</strong>
+
+  <p> Implement the functions of math.h for the GMP mpf layer!  Check the book
+      "Pi and the AGM" by Borwein and Borwein for ideas how to do this.  These
+      functions are desirable: acos, acosh, asin, asinh, atan, atanh, atan2,
+      cos, cosh, exp, log, log10, pow, sin, sinh, tan, tanh.
 
 
 <li> <strong>Faster sqrt</strong>
 
   <p> The current code uses divisions, which are reasonably fast, but it'd be
       possible to use only multiplications by computing 1/sqrt(A) using this
-      iteration:
+      formula:
       <pre>
-				    2
-		   x   = x  (3 &minus; A x )/2
-		    i+1	  i	    i  </pre>
+                                    2
+                   x   = x  (3 &minus; A x )/2
+                    i+1   i         i  </pre>
       The square root can then be computed like this:
       <pre>
-		     sqrt(A) = A x
-				  n  </pre>
-  <p> That final multiply might be the full size of the input (though it might
+                     sqrt(A) = A x
+                                  n  </pre>
+      <p> That final multiply might be the full size of the input (though it might
       only need the high half of that), so there may or may not be any speedup
       overall.
-
-  <p> We should probably allow a special exponent-like parameter, to speed
-      computations of a precise square root of a small number in mpf and mpfr.
 
 
 <li> <strong>Nth root</strong>
 
-  <p> Improve mpn_rootrem.  The current code is not too bad, but its time
-      complexity is a function of the input, while it is possible to make
-      the <i>average</i> complexity a function of the output.
+  <p> Improve mpn_rootrem.  The current code is really naive, using full
+      precision from the first iteration.  Also, calling mpn_pow_1 isn't very
+      clever, as only 1/n of the result bits will be used; truncation after
+      each multiplication would be better.  Avoiding division might also be
+      possible.
+
+      Work mostly done, see
+      <a href="http://swox.com/gmp/development.html">http://swox.com/gmp/development.html</a>.
 
 
-<li> <strong>Fat binaries</strong>
+<li> <strong>Quotient-Only Division</strong>
 
-  <p> Add more functions to the set of fat functions.
+  <p> Some work can be saved when only the quotient is required in a division,
+      basically the necessary correction -0, -1 or -2 to the estimated quotient
+      can almost always be determined from only a few limbs of multiply and
+      subtract, rather than forming a complete remainder.  The greatest savings
+      are when the quotient is small compared to the dividend and divisor.
 
-  <p> The speed of multiplication is today highly dependent on combination
-  functions like <code>addlsh1_n</code>.  A fat binary will never use any such
-  functions, since they are classified as optional.  Ideally, we should use
-  them, but making the current compile-time selections of optional functions
-  become run-time selections for fat binaries.
+  <p> Some code along these lines can be found in the current
+      <code>mpn_tdiv_qr</code>, though perhaps calculating bigger chunks of
+      remainder than might be strictly necessary.  That function in its current
+      form actually then always goes on to calculate a full remainder.
+      Burnikel and Zeigler describe a similar approach for the divide and
+      conquer case.
 
-  <p> If we make fat binaries work really well, we should move away frm tehe
-  current configure scheme (at least by default) and instead include all code
-  always.
+
+<li> <strong>Sub-Quadratic REDC and Exact Division</strong>
+
+  <p> See also
+      <a href="http://swox.com/gmp/development.html">http://swox.com/gmp/development.html</a>
+      for some new code for divexact.
+
+  <p> <code>mpn_bdivmod</code> and the <code>redc</code> in
+      <code>mpz_powm</code> should use some sort of divide and conquer
+      algorithm.  This would benefit <code>mpz_divexact</code>, and
+      <code>mpn_gcd</code> on large unequal size operands.  See "Exact Division
+      with Karatsuba Complexity" by Jebelean for a (brief) description.
+
+  <p> Failing that, some sort of <code>DIVEXACT_THRESHOLD</code> could be added
+      to control whether <code>mpz_divexact</code> uses
+      <code>mpn_bdivmod</code> or <code>mpn_tdiv_qr</code>, since the latter is
+      faster on large divisors.
+
+  <p> For the REDC, basically all that's needed is Montgomery's algorithm done
+      in multi-limb integers.  R is multiple limbs, and the inverse and
+      operands are multi-precision.
+
+  <p> For exact division the time to calculate a multi-limb inverse is not
+      amortized across many modular operations, but instead will probably
+      create a threshold below which the current style <code>mpn_bdivmod</code>
+      is best.  There's also Krandick and Jebelean, "Bidirectional Exact
+      Integer Division" to basically use a low to high exact division for the
+      low half quotient, and a quotient-only division for the high half.
+
+  <p> It will be noted that low-half and high-half multiplies, and a low-half
+      square, can be used.  These ought to each take as little as half the time
+      of a full multiply, or square, though work by Thom Mulders shows the
+      advantage is progressively lost as Karatsuba and higher algorithms are
+      applied.
 
 
 <li> <strong>Exceptions</strong>
@@ -202,8 +257,8 @@ see https://www.gnu.org/licenses/.
       externally, but being a plain C library we don't want to depend on that.
 
   <p> A C++ <code>throw</code> might be a good optional extra exceptions
-      mechanism, perhaps under a build option.  For
-      GCC <code>-fexceptions</code> will add the necessary frame information to
+      mechanism, perhaps under a build option.  For GCC
+      <code>-fexceptions</code> will add the necessary frame information to
       plain C code, or GMP could be compiled as C++.
 
   <p> Out-of-memory exceptions are expected to be handled by the
@@ -293,8 +348,8 @@ see https://www.gnu.org/licenses/.
       uses would be,
 
       <ol>
-	<li> Checking speed variations between compilers.
-	<li> Checking relative performance between systems or CPUs.
+        <li> Checking speed variations between compilers.
+        <li> Checking relative performance between systems or CPUs.
       </ol>
 
   <p> A combination of measuring some fundamental routines and some
@@ -328,6 +383,131 @@ see https://www.gnu.org/licenses/.
       <code>__declspec(restrict)</code>, so a <code>#define</code> of
       <code>restrict</code> should be avoided.  It might be wisest to setup a
       <code>gmp_restrict</code>.
+
+
+<li> <strong>Nx1 Division</strong>
+
+  <p> The limb-by-limb dependencies in the existing Nx1 division (and
+      remainder) code means that chips with multiple execution units or
+      pipelined multipliers are not fully utilized.
+
+  <p> One possibility is to follow the current preinv method but taking two
+      limbs at a time.  That means a 2x2-&gt;4 and a 2x1-&gt;2 multiply for
+      each two limbs processed, and because the 2x2 and 2x1 can each be done in
+      parallel the latency will be not much more than 2 multiplies for two
+      limbs, whereas the single limb method has a 2 multiply latency for just
+      one limb.  A version of <code>mpn_divrem_1</code> doing this has been
+      written in C, but not yet tested on likely chips.  Clearly this scheme
+      would extend to 3x3-&gt;9 and 3x1-&gt;3 etc, though with diminishing
+      returns.
+
+  <p> For <code>mpn_mod_1</code>, Peter L. Montgomery proposes the following
+      scheme.  For a limb R=2^<code>bits_per_mp_limb</code>, pre-calculate
+      values R mod N, R^2 mod N, R^3 mod N, R^4 mod N.  Then take dividend
+      limbs and multiply them by those values, thereby reducing them (moving
+      them down) by the corresponding factor.  The products can be added to
+      produce an intermediate remainder of 2 or 3 limbs to be similarly
+      included in the next step.  The point is that such multiplies can be done
+      in parallel, meaning as little as 1 multiply worth of latency for 4
+      limbs.  If the modulus N is less than R/4 (or is it R/5?) the summed
+      products will fit in 2 limbs, otherwise 3 will be required, but with the
+      high only being small.  Clearly this extends to as many factors of R as a
+      chip can efficiently apply.
+
+  <p> The logical conclusion for powers R^i is a whole array "p[i] = R^i mod N"
+      for i up to k, the size of the dividend.  This could then be applied at
+      multiplier throughput speed like an inner product.  If the powers took
+      roughly k divide steps to calculate then there'd be an advantage any time
+      the same N was used three or more times.  Suggested by Victor Shoup in
+      connection with chinese-remainder style decompositions, but perhaps with
+      other uses.
+
+  <p> <code>mpn_modexact_1_odd</code> calculates an x in the range 0&lt;=x&lt;d
+      satisfying a = q*d + x*b^n, where b=2^bits_per_limb.  The factor b^n
+      needed to get the true remainder r could be calculated by a powering
+      algorithm, allowing <code>mpn_modexact_1_odd</code> to be pressed into
+      service for an <code>mpn_mod_1</code>.  <code>modexact_1</code> is
+      simpler and on some chips can run noticeably faster than plain
+      <code>mod_1</code>, on Athlon for instance 11 cycles/limb instead of 17.
+      Such a difference could soon overcome the time to calculate b^n.  The
+      requirement for an odd divisor in <code>modexact</code> can be handled by
+      some shifting on-the-fly, or perhaps by an extra partial-limb step at the
+      end.
+
+
+<li> <strong>Factorial</strong>
+
+  <p> The removal of twos in the current code could be extended to factors of 3
+      or 5.  Taking this to its logical conclusion would be a complete
+      decomposition into powers of primes.  The power for a prime p is of
+      course floor(n/p)+floor(n/p^2)+...  Conrad Curry found this is quite fast
+      (using simultaneous powering as per Handbook of Applied Cryptography
+      algorithm 14.88).
+
+  <p> A difficulty with using all primes is that quite large n can be
+      calculated on a system with enough memory, larger than we'd probably want
+      for a table of primes, so some sort of sieving would be wanted.  Perhaps
+      just taking out the factors of 3 and 5 would give most of the speedup
+      that a prime decomposition can offer.
+
+
+<li> <strong>Binomial Coefficients</strong>
+
+  <p> An obvious improvement to the current code would be to strip factors of 2
+      from each multiplier and divisor and count them separately, to be applied
+      with a bit shift at the end.  Factors of 3 and perhaps 5 could even be
+      handled similarly.
+
+  <p> Conrad Curry reports a big speedup for binomial coefficients using a
+      prime powering scheme, at least for k near n/2.  Of course this is only
+      practical for moderate size n since again it requires primes up to n.
+
+  <p> When k is small the current (n-k+1)...n/1...k will be fastest.  Some sort
+      of rule would be needed for when to use this or when to use prime
+      powering.  Such a rule will be a function of both n and k.  Some
+      investigation is needed to see what sort of shape the crossover line will
+      have, the usual parameter tuning can of course find machine dependent
+      constants to fill in where necessary.
+
+  <p> An easier possibility also reported by Conrad Curry is that it may be
+      faster not to divide out the denominator (1...k) one-limb at a time, but
+      do one big division at the end.  Is this because a big divisor in
+      <code>mpn_bdivmod</code> trades the latency of
+      <code>mpn_divexact_1</code> for the throughput of
+      <code>mpn_submul_1</code>?  Overheads must hurt though.
+
+  <p> Another reason a big divisor might help is that
+      <code>mpn_divexact_1</code> won't be getting a full limb in
+      <code>mpz_bin_uiui</code>.  It's called when the n accumulator is full
+      but the k may be far from full.  Perhaps the two could be decoupled so k
+      is applied when full.  It'd be necessary to delay consideration of k
+      terms until the corresponding n terms had been applied though, since
+      otherwise the division won't be exact.
+
+
+<li> <strong>Perfect Power Testing</strong>
+
+  <p> <code>mpz_perfect_power_p</code> could be improved in a number of ways,
+      for instance p-adic arithmetic to find possible roots.
+
+  <p> Non-powers can be quickly identified by checking for Nth power residues
+      modulo small primes, like <code>mpn_perfect_square_p</code> does for
+      squares.  The residues to each power N for a given remainder could be
+      grouped into a bit mask, the masks for the remainders to each divisor
+      would then be "and"ed together to hopefully leave only a few candidate
+      powers.  Need to think about how wide to make such masks, ie. how many
+      powers to examine in this way.
+
+  <p> Any zero remainders found in residue testing reveal factors which can be
+      divided out, with the multiplicity restricting the powers that need to be
+      considered, as per the current code.  Further prime dividing should be
+      grouped into limbs like <code>PP</code>.  Need to think about how much
+      dividing to do like that, probably more for bigger inputs, less for
+      smaller inputs.
+
+  <p> <code>mpn_gcd_1</code> would probably be better than the current private
+      GCD routine.  The use it's put to isn't time-critical, and it might help
+      ensure correctness to just use the main GCD routine.
 
 
 <li> <strong>Prime Testing</strong>
@@ -449,16 +629,6 @@ see https://www.gnu.org/licenses/.
       selecting public symbols (used now for libmp).
 
 
-<li> <strong>Math functions for the mpf layer</strong>
-
-  <p> Implement the functions of math.h for the GMP mpf layer!	Check the book
-      "Pi and the AGM" by Borwein and Borwein for ideas how to do this.  These
-      functions are desirable: acos, acosh, asin, asinh, atan, atanh, atan2,
-      cos, cosh, exp, log, log10, pow, sin, sinh, tan, tanh.
-
-  <p> Note that the <a href="http://mpfr.org">mpfr</a> functions already
-  provide these functions, and that we usually recommend new programs to use
-  mpfr instead of mpf.
 </ul>
 <hr>
 

@@ -5,28 +5,19 @@ Copyright 1999, 2000, 2002, 2003, 2005 Free Software Foundation, Inc.
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 
 /* The extension here is three versions of an mpn arithmetic mean.  These
@@ -68,9 +59,9 @@ see https://www.gnu.org/licenses/.  */
 
 
 #define SPEED_EXTRA_PROTOS                                              \
-  double speed_mean_calls (struct speed_params *s);			\
-  double speed_mean_open  (struct speed_params *s);			\
-  double speed_mean_open2 (struct speed_params *s);
+  double speed_mean_calls __GMP_PROTO ((struct speed_params *s));       \
+  double speed_mean_open  __GMP_PROTO ((struct speed_params *s));       \
+  double speed_mean_open2 __GMP_PROTO ((struct speed_params *s));
 
 #define SPEED_EXTRA_ROUTINES            \
   { "mean_calls",  speed_mean_calls  }, \
@@ -93,8 +84,8 @@ mean_calls (mp_ptr wp, mp_srcptr xp, mp_srcptr yp, mp_size_t size)
   ASSERT (size >= 1);
 
   c = mpn_add_n (wp, xp, yp, size);
-  ret = mpn_rshift (wp, wp, size, 1) >> (GMP_LIMB_BITS-1);
-  wp[size-1] |= (c << (GMP_LIMB_BITS-1));
+  ret = mpn_rshift (wp, wp, size, 1) >> (BITS_PER_MP_LIMB-1);
+  wp[size-1] |= (c << (BITS_PER_MP_LIMB-1));
   return ret;
 }
 
@@ -118,7 +109,7 @@ mean_open (mp_ptr wp, mp_srcptr xp, mp_srcptr yp, mp_size_t size)
   c = (wprev < x);
   ret = (wprev & 1);
 
-#define RSHIFT(hi,lo)   (((lo) >> 1) | ((hi) << (GMP_LIMB_BITS-1)))
+#define RSHIFT(hi,lo)   (((lo) >> 1) | ((hi) << (BITS_PER_MP_LIMB-1)))
 
   for (i = 1; i < size; i++)
     {

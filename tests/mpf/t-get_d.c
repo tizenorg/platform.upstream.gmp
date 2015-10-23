@@ -1,28 +1,30 @@
 /* Test mpf_get_d and mpf_set_d.
 
-Copyright 1996, 1999-2001, 2009 Free Software Foundation, Inc.
+   Copyright 1996, 1999, 2000, 2001 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+   This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+   The GNU MP Library is free software; you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or (at your
+   option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+   The GNU MP Library is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+   License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA. */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "gmp.h"
 #include "tests.h"
 
-#if defined (__vax) || defined (__vax__)
+#if defined (__vax__)
 #define LOW_BOUND 1e-38
 #define HIGH_BOUND 8e37
 #endif
@@ -39,32 +41,6 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #define LOW_BOUND 1e-300
 #define HIGH_BOUND 1e300
 #endif
-
-void
-test_denorms (int prc)
-{
-#ifdef _GMP_IEEE_FLOATS
-  double d1, d2;
-  mpf_t f;
-  int i;
-
-  mpf_set_default_prec (prc);
-
-  mpf_init (f);
-
-  d1 = 1.9;
-  for (i = 0; i < 820; i++)
-    {
-      mpf_set_d (f, d1);
-      d2 = mpf_get_d (f);
-      if (d1 != d2)
-        abort ();
-      d1 *= 0.4;
-    }
-
-  mpf_clear (f);
-#endif
-}
 
 int
 main (int argc, char **argv)
@@ -94,12 +70,6 @@ main (int argc, char **argv)
 
   mpf_clear (u);
   mpf_clear (v);
-
-  test_denorms (10);
-  test_denorms (32);
-  test_denorms (64);
-  test_denorms (100);
-  test_denorms (200);
 
   tests_end ();
   exit (0);

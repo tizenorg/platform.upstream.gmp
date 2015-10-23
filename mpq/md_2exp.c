@@ -1,33 +1,25 @@
 /* mpq_mul_2exp, mpq_div_2exp - multiply or divide by 2^N */
 
 /*
-Copyright 2000, 2002, 2012 Free Software Foundation, Inc.
+Copyright 2000, 2002 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 #include "gmp.h"
 #include "gmp-impl.h"
@@ -40,7 +32,7 @@ see https://www.gnu.org/licenses/.  */
 
 static void
 mord_2exp (mpz_ptr ldst, mpz_ptr rdst, mpz_srcptr lsrc, mpz_srcptr rsrc,
-           mp_bitcnt_t n)
+           unsigned long n)
 {
   mp_size_t  rsrc_size = SIZ(rsrc);
   mp_size_t  len = ABS (rsrc_size);
@@ -59,13 +51,14 @@ mord_2exp (mpz_ptr ldst, mpz_ptr rdst, mpz_srcptr lsrc, mpz_srcptr rsrc,
 
   /* no realloc here if rsrc==rdst, so p and rsrc_ptr remain valid */
   len -= (p - rsrc_ptr);
-  rdst_ptr = MPZ_REALLOC (rdst, len);
+  MPZ_REALLOC (rdst, len);
+  rdst_ptr = PTR(rdst);
 
   if ((plow & 1) || n == 0)
     {
-      /* need INCR when src==dst */
+      /* need DECR when src==dst */
       if (p != rdst_ptr)
-        MPN_COPY_INCR (rdst_ptr, p, len);
+        MPN_COPY_DECR (rdst_ptr, p, len);
     }
   else
     {
@@ -91,21 +84,23 @@ mord_2exp (mpz_ptr ldst, mpz_ptr rdst, mpz_srcptr lsrc, mpz_srcptr rsrc,
 
 
 void
-mpq_mul_2exp (mpq_ptr dst, mpq_srcptr src, mp_bitcnt_t n)
+mpq_mul_2exp (mpq_ptr dst, mpq_srcptr src, unsigned long n)
 {
-  mord_2exp (NUM(dst), DEN(dst), NUM(src), DEN(src), n);
+  mord_2exp (mpq_numref (dst), mpq_denref (dst),
+             mpq_numref (src), mpq_denref (src), n);
 }
 
 void
-mpq_div_2exp (mpq_ptr dst, mpq_srcptr src, mp_bitcnt_t n)
+mpq_div_2exp (mpq_ptr dst, mpq_srcptr src, unsigned long n)
 {
-  if (SIZ(NUM(src)) == 0)
+  if (SIZ (mpq_numref(src)) == 0)
     {
-      SIZ(NUM(dst)) = 0;
-      SIZ(DEN(dst)) = 1;
-      PTR(DEN(dst))[0] = 1;
+      dst->_mp_num._mp_size = 0;
+      dst->_mp_den._mp_size = 1;
+      dst->_mp_den._mp_d[0] = 1;
       return;
     }
 
-  mord_2exp (DEN(dst), NUM(dst), DEN(src), NUM(src), n);
+  mord_2exp (mpq_denref (dst), mpq_numref (dst),
+             mpq_denref (src), mpq_numref (src), n);
 }

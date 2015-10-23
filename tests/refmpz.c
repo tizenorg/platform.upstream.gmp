@@ -1,21 +1,23 @@
 /* Reference mpz functions.
 
-Copyright 1997, 1999-2002 Free Software Foundation, Inc.
+Copyright 1997, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 /* always do assertion checking */
 #define WANT_ASSERT  1
@@ -29,7 +31,7 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 
 /* Change this to "#define TRACE(x) x" for some traces. */
-#define TRACE(x)
+#define TRACE(x) 
 
 
 /* FIXME: Shouldn't use plain mpz functions in a reference routine. */
@@ -67,10 +69,10 @@ refmpz_hamdist (mpz_srcptr x, mpz_srcptr y)
   refmpn_copy (yp, PTR(y), ysize);
 
   if (SIZ(x) < 0)
-    refmpn_neg (xp, xp, tsize);
+    refmpn_neg_n (xp, xp, tsize);
 
   if (SIZ(x) < 0)
-    refmpn_neg (yp, yp, tsize);
+    refmpn_neg_n (yp, yp, tsize);
 
   ret = refmpn_hamdist (xp, yp, tsize);
 
@@ -144,29 +146,29 @@ refmpz_kronecker (mpz_srcptr a_orig, mpz_srcptr b_orig)
       ASSERT (mpz_sgn (b) > 0);
 
       TRACE (printf ("top\n");
-	     mpz_trace (" a", a);
-	     mpz_trace (" b", b));
+             mpz_trace (" a", a);
+             mpz_trace (" b", b));
 
       if (mpz_cmp (a, b) < 0)
-	{
-	  TRACE (printf ("swap\n"));
-	  mpz_swap (a, b);
-	  result_bit1 ^= JACOBI_RECIP_UU_BIT1 (PTR(a)[0], PTR(b)[0]);
-	}
+        {
+          TRACE (printf ("swap\n"));
+          mpz_swap (a, b);
+          result_bit1 ^= JACOBI_RECIP_UU_BIT1 (PTR(a)[0], PTR(b)[0]);
+        }
 
       if (mpz_cmp_ui (b, 1) == 0)
-	break;
+        break;
 
       mpz_sub (a, a, b);
       TRACE (printf ("sub\n");
-	     mpz_trace (" a", a));
+             mpz_trace (" a", a));
       if (mpz_sgn (a) == 0)
-	goto zero;
+        goto zero;
 
       twos = mpz_scan1 (a, 0L);
       mpz_fdiv_q_2exp (a, a, twos);
       TRACE (printf ("twos %lu\n", twos);
-	     mpz_trace (" a", a));
+             mpz_trace (" a", a));
       result_bit1 ^= JACOBI_TWOS_U_BIT1 (twos, PTR(b)[0]);
     }
 
@@ -184,46 +186,17 @@ refmpz_kronecker (mpz_srcptr a_orig, mpz_srcptr b_orig)
 int
 refmpz_jacobi (mpz_srcptr a, mpz_srcptr b)
 {
-  ASSERT_ALWAYS (mpz_sgn (b) > 0);
-  ASSERT_ALWAYS (mpz_odd_p (b));
-
-  return refmpz_kronecker (a, b);
+  mpz_t  b_odd;
+  mpz_init_set (b_odd, b);
+  if (mpz_sgn (b_odd) != 0)
+    mpz_fdiv_q_2exp (b_odd, b_odd, mpz_scan1 (b_odd, 0L));
+  return refmpz_kronecker (a, b_odd);
 }
 
-/* Legendre symbol via powm. p must be an odd prime. */
 int
-refmpz_legendre (mpz_srcptr a, mpz_srcptr p)
+refmpz_legendre (mpz_srcptr a, mpz_srcptr b)
 {
-  int res;
-
-  mpz_t r;
-  mpz_t e;
-
-  ASSERT_ALWAYS (mpz_sgn (p) > 0);
-  ASSERT_ALWAYS (mpz_odd_p (p));
-
-  mpz_init (r);
-  mpz_init (e);
-
-  mpz_fdiv_r (r, a, p);
-
-  mpz_set (e, p);
-  mpz_sub_ui (e, e, 1);
-  mpz_fdiv_q_2exp (e, e, 1);
-  mpz_powm (r, r, e, p);
-
-  /* Normalize to a more or less symmetric range around zero */
-  if (mpz_cmp (r, e) > 0)
-    mpz_sub (r, r, p);
-
-  ASSERT_ALWAYS (mpz_cmpabs_ui (r, 1) <= 0);
-
-  res = mpz_sgn (r);
-
-  mpz_clear (r);
-  mpz_clear (e);
-
-  return res;
+  return refmpz_jacobi (a, b);
 }
 
 

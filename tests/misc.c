@@ -1,21 +1,23 @@
 /* Miscellaneous test program support routines.
 
-Copyright 2000-2003, 2005, 2013 Free Software Foundation, Inc.
+Copyright 2000, 2001, 2002, 2003, 2005 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "config.h"
 
@@ -123,7 +125,7 @@ tests_rand_end (void)
 
 
 /* Only used if CPU calling conventions checking is available. */
-mp_limb_t (*calling_conventions_function) (ANYARGS);
+mp_limb_t (*calling_conventions_function) _PROTO ((ANYARGS));
 
 
 /* Return p advanced to the next multiple of "align" bytes.  "align" must be
@@ -132,8 +134,8 @@ mp_limb_t (*calling_conventions_function) (ANYARGS);
 void *
 align_pointer (void *p, size_t align)
 {
-  gmp_intptr_t d;
-  d = ((gmp_intptr_t) p) & (align-1);
+  unsigned long  d;
+  d = ((unsigned long) p) & (align-1);
   d = (d != 0 ? align-d : 0);
   return (void *) (((char *) p) + d);
 }
@@ -163,7 +165,7 @@ __gmp_allocate_strdup (const char *s)
   size_t  len;
   char    *t;
   len = strlen (s);
-  t = (char *) (*__gmp_allocate_func) (len+1);
+  t = (*__gmp_allocate_func) (len+1);
   memcpy (t, s, len+1);
   return t;
 }
@@ -370,11 +372,11 @@ urandom (void)
 {
 #if GMP_NAIL_BITS == 0
   mp_limb_t  n;
-  _gmp_rand (&n, RANDS, GMP_LIMB_BITS);
+  _gmp_rand (&n, RANDS, BITS_PER_MP_LIMB);
   return n;
 #else
   mp_limb_t n[2];
-  _gmp_rand (n, RANDS, GMP_LIMB_BITS);
+  _gmp_rand (n, RANDS, BITS_PER_MP_LIMB);
   return n[0] + (n[1] << GMP_NUMB_BITS);
 #endif
 }
@@ -382,7 +384,7 @@ urandom (void)
 
 /* Call (*func)() with various random number generators. */
 void
-call_rand_algs (void (*func) (const char *, gmp_randstate_ptr))
+call_rand_algs (void (*func) __GMP_PROTO ((const char *, gmp_randstate_ptr)))
 {
   gmp_randstate_t  rstate;
   mpz_t            a;
@@ -465,7 +467,7 @@ tests_isinf (double d)
 int
 tests_hardware_setround (int mode)
 {
-#if WANT_ASSEMBLY && HAVE_HOST_CPU_FAMILY_x86
+#if HAVE_HOST_CPU_FAMILY_x86
   int  rc;
   switch (mode) {
   case 0: rc = 0; break;  /* nearest */
@@ -486,7 +488,7 @@ tests_hardware_setround (int mode)
 int
 tests_hardware_getround (void)
 {
-#if WANT_ASSEMBLY && HAVE_HOST_CPU_FAMILY_x86
+#if HAVE_HOST_CPU_FAMILY_x86
   switch ((x86_fstcw () & ~0xC00) >> 10) {
   case 0: return 0; break;  /* nearest */
   case 1: return 3; break;  /* down    */
@@ -563,3 +565,4 @@ tests_sigfpe_done (void)
 {
   signal (SIGFPE, SIG_DFL);
 }
+

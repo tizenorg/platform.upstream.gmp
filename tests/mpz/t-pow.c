@@ -1,21 +1,24 @@
 /* Test mpz_pow_ui and mpz_ui_pow_ui.
 
-Copyright 1997, 1999-2001 Free Software Foundation, Inc.
+Copyright 1997, 1999, 2000, 2001 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,8 +34,6 @@ check_one (mpz_srcptr want, mpz_srcptr base, unsigned long exp)
   mpz_t  got;
 
   mpz_init (got);
-
-  MPZ_CHECK_FORMAT (want);
 
   mpz_pow_ui (got, base, exp);
   if (mpz_cmp (got, want))
@@ -62,14 +63,14 @@ check_one (mpz_srcptr want, mpz_srcptr base, unsigned long exp)
       unsigned long  base_u = mpz_get_ui (base);
       mpz_ui_pow_ui (got, base_u, exp);
       if (mpz_cmp (got, want))
-	{
-	  printf    ("mpz_ui_pow_ui wrong\n");
-	  printf    ("  base=%lu (0x%lX)\n", base_u, base_u);
-	  printf    ("  exp = %lu (0x%lX)\n", exp, exp);
-	  mpz_trace ("  got ", got);
-	  mpz_trace ("  want", want);
-	  abort ();
-	}
+        {
+          printf    ("mpz_ui_pow_ui wrong\n");
+          printf    ("  base=%lu (0x%lX)\n", base_u, base_u);
+          printf    ("  exp = %lu (0x%lX)\n", exp, exp);
+          mpz_trace ("  got ", got);
+          mpz_trace ("  want", want);
+          abort ();
+        }
     }
 
   mpz_clear (got);
@@ -165,7 +166,7 @@ check_random (int reps)
   int                i;
   unsigned long      size_range, exp;
   gmp_randstate_ptr  rands = RANDS;
-
+  
   mpz_init (base);
   mpz_init (want);
 
@@ -198,7 +199,7 @@ check_random (int reps)
 int
 main (int argc, char **argv)
 {
-  int reps = 5000;
+  int reps = 500;
 
   /* dummy call to drag in refmpn.o for testing mpz/n_pow_ui.c with
      refmpn_mul_2 */

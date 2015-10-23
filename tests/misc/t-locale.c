@@ -1,21 +1,23 @@
 /* Test locale support, or attempt to do so.
 
-Copyright 2001, 2002, 2011 Free Software Foundation, Inc.
+Copyright 2001, 2002 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #define _GNU_SOURCE    /* for DECIMAL_POINT in glibc langinfo.h */
 
@@ -41,15 +43,8 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include "gmp-impl.h"
 #include "tests.h"
 
-#ifdef __MINGW32__
-int
-main (void)
-{
-  exit (0);
-}
-#else
 
-const char *decimal_point;
+char *decimal_point;
 
 /* Replace the libc localeconv with one we can manipulate. */
 #if HAVE_LOCALECONV
@@ -57,7 +52,7 @@ struct lconv *
 localeconv (void)
 {
   static struct lconv  l;
-  l.decimal_point = (char *) decimal_point;
+  l.decimal_point = decimal_point;
   return &l;
 }
 #endif
@@ -69,20 +64,20 @@ nl_langinfo (nl_item n)
 {
 #if defined (DECIMAL_POINT)
   if (n == DECIMAL_POINT)
-    return (char *) decimal_point;
+    return decimal_point;
 #endif
 #if defined (RADIXCHAR)
   if (n == RADIXCHAR)
-    return (char *) decimal_point;
+    return decimal_point;
 #endif
-  return (char *) "";
+  return "";
 }
 #endif
 
 void
 check_input (void)
 {
-  static const char *point[] = {
+  static char *point[] = {
     ".", ",", "WU", "STR", "ZTV***"
   };
 
@@ -113,7 +108,7 @@ check_input (void)
 
   for (i = 0; i < numberof (point); i++)
     {
-      decimal_point = (const char *) point[i];
+      decimal_point = point[i];
 
       for (neg = 0; neg <= 1; neg++)
         {
@@ -198,4 +193,3 @@ main (void)
   tests_memory_end ();
   exit (0);
 }
-#endif

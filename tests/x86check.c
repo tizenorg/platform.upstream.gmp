@@ -1,22 +1,25 @@
 /* x86 calling conventions checking. */
 
 /*
-Copyright 2000, 2001, 2010 Free Software Foundation, Inc.
+Copyright 2000, 2001 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 #include <stdio.h>
 #include "gmp.h"
@@ -24,30 +27,13 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include "tests.h"
 
 
-/* Vector if constants and register values.  We use one vector to allow access
-   via a base pointer, very beneficial for the PIC-enabled amd64call.asm.  */
-mp_limb_t calling_conventions_values[17] =
-{
-  CNST_LIMB(0x12345678),	/* want_ebx */
-  CNST_LIMB(0x89ABCDEF),	/* want_ebp */
-  CNST_LIMB(0xDEADBEEF),	/* want_esi */
-  CNST_LIMB(0xFFEEDDCC),	/* want_edi */
-
-  CNST_LIMB(0xFEEDABBA),	/* JUNK_EAX */
-  CNST_LIMB(0xAB78DE89),	/* JUNK_ECX */
-  CNST_LIMB(0x12389018)		/* JUNK_EDX */
-
-  /* rest of array used for dynamic values.  */
-};
-
-/* Index starts for various regions in above vector.  */
-#define WANT	0
-#define JUNK	4
-#define SAVE	7
-#define RETADDR	11
-#define VAL	12
-#define EFLAGS	16
-
+/* temporaries */
+int  calling_conventions_save_ebx;
+int  calling_conventions_save_esi;
+int  calling_conventions_save_edi;
+int  calling_conventions_save_ebp;
+int  calling_conventions_retaddr;
+int  calling_conventions_retval;
 
 /* values to check */
 struct {
@@ -56,15 +42,17 @@ struct {
   unsigned  tag;
   unsigned  other[4];
 } calling_conventions_fenv;
+int  calling_conventions_ebx;
+int  calling_conventions_esi;
+int  calling_conventions_edi;
+int  calling_conventions_ebp;
+int  calling_conventions_eflags;
 
 /* expected values, as per x86call.asm */
 #define VALUE_EBX   0x01234567
 #define VALUE_ESI   0x89ABCDEF
 #define VALUE_EDI   0xFEDCBA98
 #define VALUE_EBP   0x76543210
-
-
-const char *regname[] = {"ebx", "ebp", "esi", "edi"};
 
 #define DIR_BIT(eflags)   (((eflags) & (1<<10)) != 0)
 
@@ -76,7 +64,6 @@ calling_conventions_check (void)
 {
   const char  *header = "Violated calling conventions:\n";
   int  ret = 1;
-  int i;
 
 #define CHECK(callreg, regstr, value)                   \
   if (callreg != value)                                 \
@@ -87,15 +74,15 @@ calling_conventions_check (void)
       ret = 0;                                          \
     }
 
-  for (i = 0; i < 4; i++)
-    {
-      CHECK (calling_conventions_values[VAL+i], regname[i], calling_conventions_values[WANT+i]);
-    }
+  CHECK (calling_conventions_ebx, "ebx", VALUE_EBX);
+  CHECK (calling_conventions_esi, "esi", VALUE_ESI);
+  CHECK (calling_conventions_edi, "edi", VALUE_EDI);
+  CHECK (calling_conventions_ebp, "ebp", VALUE_EBP);
 
-  if (DIR_BIT (calling_conventions_values[EFLAGS]) != 0)
+  if (DIR_BIT (calling_conventions_eflags) != 0)
     {
       printf ("%s   eflags dir bit  got %d want 0\n",
-              header, DIR_BIT (calling_conventions_values[EFLAGS]));
+              header, DIR_BIT (calling_conventions_eflags));
       header = "";
       ret = 0;
     }

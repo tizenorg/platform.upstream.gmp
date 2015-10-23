@@ -3,20 +3,23 @@
 /*
 Copyright 1999 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 /* T is upper dimension.  Z_A is the LC multiplier, which is
    relatively prime to Z_M, the LC modulus.  The result is put in
@@ -42,7 +45,7 @@ main (int argc, char *argv[])
   unsigned int n;
   mpz_t a, m;
   mpf_t res[GMP_SPECT_MAXT], res_min[GMP_SPECT_MAXT], f_tmp;
-  int f;
+  register int f;
 
 
   mpz_init (a);
@@ -126,7 +129,7 @@ main (int argc, char *argv[])
 }
 
 
-void
+void 
 debug_foo()
 {
   if (0)

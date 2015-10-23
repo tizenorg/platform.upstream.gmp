@@ -1,21 +1,23 @@
 /* Test gmp_scanf and related functions.
 
-Copyright 2001-2004 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 
 /* Usage: t-scanf [-s]
@@ -29,7 +31,13 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
    seem like too much trouble. */
 
 
+#include "config.h"
+
+#if HAVE_STDARG
 #include <stdarg.h>
+#else
+#include <varargs.h>
+#endif
 
 #include <stddef.h>    /* for ptrdiff_t */
 #include <stdio.h>
@@ -57,7 +65,7 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 
 int   option_libc_scanf = 0;
 
-typedef int (*fun_t) (const char *, const char *, void *, void *);
+typedef int (*fun_t) _PROTO ((const char *, const char *, void *, void *));
 
 
 /* This problem was seen on powerpc7450-apple-darwin7.0.0, sscanf returns 0
@@ -123,12 +131,25 @@ int   fromstring_next_c;
 
 /* Call gmp_fscanf, reading the "input" string data provided. */
 int
+#if HAVE_STDARG
 fromstring_gmp_fscanf (const char *input, const char *fmt, ...)
+#else
+fromstring_gmp_fscanf (va_alist)
+     va_dcl
+#endif
 {
   va_list  ap;
   FILE     *fp;
   int      ret;
+#if HAVE_STDARG
   va_start (ap, fmt);
+#else
+  const char    *input;
+  const char    *fmt;
+  va_start (ap);
+  input = va_arg (ap, const char *);
+  fmt = va_arg (ap, const char *);
+#endif
 
   fp = fopen (TEMPFILE, "w+");
   ASSERT_ALWAYS (fp != NULL);
@@ -210,7 +231,7 @@ fun_sscanf (const char *input, const char *fmt, void *a1, void *a2)
   int     ret;
 
   size = strlen (input) + 1;
-  input_writable = (char *) (*__gmp_allocate_func) (size);
+  input_writable = (*__gmp_allocate_func) (size);
   memcpy (input_writable, input, size);
 
   if (a2 == NULL)
@@ -1363,7 +1384,7 @@ check_n (void)
     mpq_t  x[2];
     mpq_init (x[0]);
     mpq_init (x[1]);
-    mpq_set_ui (x[0], 987L, 654L);
+    mpq_set_ui (x[0], -987L, 654L);
     mpq_set_ui (x[1], 4115L, 226L);
     ret = gmp_sscanf ("xyz   ", "xyz%Qn", x[0]);
     MPQ_CHECK_FORMAT (x[0]);
@@ -1388,8 +1409,8 @@ check_n (void)
     mpf_t  x[2];
     mpf_init (x[0]);
     mpf_init (x[1]);
-    mpf_set_ui (x[0], 987L);
-    mpf_set_ui (x[1], 654L);
+    mpf_set_ui (x[0], -987L);
+    mpf_set_ui (x[1],  654L);
     ret = gmp_sscanf ("xyz   ", "xyz%Fn", x[0]);
     MPF_CHECK_FORMAT (x[0]);
     MPF_CHECK_FORMAT (x[1]);

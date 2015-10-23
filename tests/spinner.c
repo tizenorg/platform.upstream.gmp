@@ -1,22 +1,24 @@
 /* A stupid little spinning wheel designed to make it look like useful work
    is being done.
 
-Copyright 1999-2001 Free Software Foundation, Inc.
+Copyright 1999, 2000, 2001 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "config.h"
 
@@ -70,7 +72,7 @@ spinner_signal (int signum)
 
    This is done the first time spinner() is called, so an application
    doesn't need to call this directly.
-
+  
    The spinner is only wanted if the output is a tty.  */
 
 #define SPINNER_WANTED_INIT() \
@@ -80,8 +82,8 @@ void
 spinner_init (void)
 {
   spinner_wanted = isatty (fileno (stdout));
-  if (spinner_wanted == -1)
-    abort ();
+  if (spinner_wanted == -1)                   
+    abort ();                                  
 
   if (!spinner_wanted)
     return;
@@ -94,7 +96,7 @@ spinner_init (void)
     }
   alarm (1);
 
-  /* unbuffered output so the spinner will show up */
+  /* unbufferred output so the spinner will show up */
   setbuf (stdout, NULL);
 }
 
@@ -116,14 +118,14 @@ spinner (void)
       spinner_tick = 0;
 
       if (spinner_count != 0)
-	{
-	  sprintf (buf+1, " %lu\r", spinner_count);
-	}
+        {
+          sprintf (buf+1, " %lu\r", spinner_count);
+        }
       else
-	{
-	  buf[1] = '\r';
-	  buf[2] = '\0';
-	}
+        {
+          buf[1] = '\r';
+          buf[2] = '\0';
+        }
       fputs (buf, stdout);
     }
 }

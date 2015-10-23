@@ -1,50 +1,55 @@
 /* mpz_set (dest_integer, src_integer) -- Assign DEST_INTEGER from SRC_INTEGER.
 
-Copyright 1991, 1993-1995, 2000, 2012 Free Software Foundation, Inc.
+Copyright 1991, 1993, 1994, 1995, 2000 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "gmp.h"
 #include "gmp-impl.h"
 
 
+#ifdef BERKELEY_MP
+#include "mp.h"
+#define FUNCTION   move
+#define ARGUMENTS  mpz_srcptr u, mpz_ptr w
+
+#else
+#define FUNCTION   mpz_set
+#define ARGUMENTS  mpz_ptr w, mpz_srcptr u
+
+#endif
+
+
 void
-mpz_set (mpz_ptr w, mpz_srcptr u)
+FUNCTION (ARGUMENTS)
 {
   mp_ptr wp, up;
   mp_size_t usize, size;
 
-  usize = SIZ(u);
+  usize = u->_mp_size;
   size = ABS (usize);
 
-  wp = MPZ_REALLOC (w, size);
+  if (w->_mp_alloc < size)
+    _mpz_realloc (w, size);
 
-  up = PTR(u);
+  wp = w->_mp_d;
+  up = u->_mp_d;
 
   MPN_COPY (wp, up, size);
-  SIZ(w) = usize;
+  w->_mp_size = usize;
 }

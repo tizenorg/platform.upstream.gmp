@@ -1,21 +1,23 @@
 /* Test conversion and I/O using mpz_out_str and mpz_inp_str.
 
-Copyright 1993, 1994, 1996, 2000, 2001, 2012 Free Software Foundation, Inc.
+Copyright 1993, 1994, 1996, 2000, 2001 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "config.h"
 
@@ -45,7 +47,7 @@ main (int argc, char **argv)
   int i;
   int reps = 10000;
   FILE *fp;
-  int base, base_out;
+  int base;
   gmp_randstate_ptr rands;
   mpz_t bs;
   unsigned long bsi, size_range;
@@ -62,7 +64,7 @@ main (int argc, char **argv)
   mpz_init (op1);
   mpz_init (op2);
 
-  fp = fopen (FILENAME, "w+");
+  fp = fopen (FILENAME, "w+"); 
 
   for (i = 0; i < reps; i++)
     {
@@ -79,42 +81,37 @@ main (int argc, char **argv)
 
       mpz_urandomb (bs, rands, 16);
       bsi = mpz_get_ui (bs);
-      base = bsi % 62 + 1;
+      base = bsi % 36 + 1;
       if (base == 1)
 	base = 0;
 
-      if (i % 2 == 0 && base <= 36)
-	base_out = -base;
-      else
-	base_out = base;
+      rewind (fp);  
+      if (mpz_out_str (fp, base, op1) == 0
+          || putc (' ', fp) == EOF
+          || fflush (fp) != 0)
+        {
+          printf ("mpz_out_str write error\n");
+          abort ();
+        }
 
-      rewind (fp);
-      if (mpz_out_str (fp, base_out, op1) == 0
-	  || putc (' ', fp) == EOF
-	  || fflush (fp) != 0)
-	{
-	  printf ("mpz_out_str write error\n");
-	  abort ();
-	}
-
-      rewind (fp);
+      rewind (fp);  
       nread = mpz_inp_str (op2, fp, base);
       if (nread == 0)
-	{
-	  if (ferror (fp))
-	    printf ("mpz_inp_str stream read error\n");
-	  else
-	    printf ("mpz_inp_str data conversion error\n");
+        {
+          if (ferror (fp))
+            printf ("mpz_inp_str stream read error\n");
+          else
+            printf ("mpz_inp_str data conversion error\n");
 	  abort ();
 	}
 
       if (nread != ftell(fp))
-	{
-	  printf ("mpz_inp_str nread doesn't match ftell\n");
-	  printf ("  nread  %lu\n", (unsigned long) nread);
-	  printf ("  ftell  %ld\n", ftell(fp));
-	  abort ();
-	}
+        {
+          printf ("mpz_inp_str nread doesn't match ftell\n");
+          printf ("  nread  %u\n", nread);
+          printf ("  ftell  %ld\n", ftell(fp));
+          abort ();
+        }
 
       if (mpz_cmp (op1, op2))
 	{

@@ -2,20 +2,22 @@
 
 Copyright 2002, 2003 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 
 /* Note that we don't use <climits> for LONG_MIN, but instead our own
@@ -41,7 +43,7 @@ check_mpz (void)
 {
   // mpz_class::fits_sint_p
   {
-    bool       fits;
+    int        fits;
     mpz_class  z;
     z = INT_MIN; fits = z.fits_sint_p(); ASSERT_ALWAYS (fits);
     z--;         fits = z.fits_sint_p(); ASSERT_ALWAYS (! fits);
@@ -51,7 +53,7 @@ check_mpz (void)
 
   // mpz_class::fits_uint_p
   {
-    bool       fits;
+    int        fits;
     mpz_class  z;
     z = 0;        fits = z.fits_uint_p(); ASSERT_ALWAYS (fits);
     z--;          fits = z.fits_uint_p(); ASSERT_ALWAYS (! fits);
@@ -61,7 +63,7 @@ check_mpz (void)
 
   // mpz_class::fits_slong_p
   {
-    bool       fits;
+    int        fits;
     mpz_class  z;
     z = LONG_MIN; fits = z.fits_slong_p(); ASSERT_ALWAYS (fits);
     z--;          fits = z.fits_slong_p(); ASSERT_ALWAYS (! fits);
@@ -71,7 +73,7 @@ check_mpz (void)
 
   // mpz_class::fits_ulong_p
   {
-    bool       fits;
+    int        fits;
     mpz_class  z;
     z = 0;         fits = z.fits_ulong_p(); ASSERT_ALWAYS (fits);
     z--;           fits = z.fits_ulong_p(); ASSERT_ALWAYS (! fits);
@@ -81,7 +83,7 @@ check_mpz (void)
 
   // mpz_class::fits_sshort_p
   {
-    bool       fits;
+    int        fits;
     mpz_class  z;
     z = SHRT_MIN; fits = z.fits_sshort_p(); ASSERT_ALWAYS (fits);
     z--;          fits = z.fits_sshort_p(); ASSERT_ALWAYS (! fits);
@@ -91,7 +93,7 @@ check_mpz (void)
 
   // mpz_class::fits_ushort_p
   {
-    bool       fits;
+    int        fits;
     mpz_class  z;
     z = 0;         fits = z.fits_ushort_p(); ASSERT_ALWAYS (fits);
     z--;           fits = z.fits_ushort_p(); ASSERT_ALWAYS (! fits);
@@ -186,7 +188,7 @@ check_mpq (void)
 
   // mpq_class::get_num, mpq_class::get_den
   {
-    const mpq_class  q(4,5);
+    mpq_class  q(4,5);
     mpz_class  z;
     z = q.get_num(); ASSERT_ALWAYS (z == 4);
     z = q.get_den(); ASSERT_ALWAYS (z == 5);
@@ -200,7 +202,7 @@ check_mpq (void)
     p = q.get_den_mpz_t(); ASSERT_ALWAYS (mpz_cmp_ui (p, 5) == 0);
   }
   {
-    const mpq_class  q(4,5);
+    mpq_class  q(4,5);
     mpz_srcptr p;
     p = q.get_num_mpz_t(); ASSERT_ALWAYS (mpz_cmp_ui (p, 4) == 0);
     p = q.get_den_mpz_t(); ASSERT_ALWAYS (mpz_cmp_ui (p, 5) == 0);
@@ -241,7 +243,7 @@ check_mpf (void)
 {
   // mpf_class::fits_sint_p
   {
-    bool       fits;
+    int        fits;
     mpf_class  f (0, 2*8*sizeof(int));
     f = INT_MIN; fits = f.fits_sint_p(); ASSERT_ALWAYS (fits);
     f--;         fits = f.fits_sint_p(); ASSERT_ALWAYS (! fits);
@@ -251,7 +253,7 @@ check_mpf (void)
 
   // mpf_class::fits_uint_p
   {
-    bool       fits;
+    int        fits;
     mpf_class  f (0, 2*8*sizeof(int));
     f = 0;        fits = f.fits_uint_p(); ASSERT_ALWAYS (fits);
     f--;          fits = f.fits_uint_p(); ASSERT_ALWAYS (! fits);
@@ -261,7 +263,7 @@ check_mpf (void)
 
   // mpf_class::fits_slong_p
   {
-    bool       fits;
+    int        fits;
     mpf_class  f (0, 2*8*sizeof(long));
     f = LONG_MIN; fits = f.fits_slong_p(); ASSERT_ALWAYS (fits);
     f--;          fits = f.fits_slong_p(); ASSERT_ALWAYS (! fits);
@@ -271,7 +273,7 @@ check_mpf (void)
 
   // mpf_class::fits_ulong_p
   {
-    bool       fits;
+    int        fits;
     mpf_class  f (0, 2*8*sizeof(long));
     f = 0;         fits = f.fits_ulong_p(); ASSERT_ALWAYS (fits);
     f--;           fits = f.fits_ulong_p(); ASSERT_ALWAYS (! fits);
@@ -281,7 +283,7 @@ check_mpf (void)
 
   // mpf_class::fits_sshort_p
   {
-    bool       fits;
+    int        fits;
     mpf_class  f (0, 2*8*sizeof(short));
     f = SHRT_MIN; fits = f.fits_sshort_p(); ASSERT_ALWAYS (fits);
     f--;          fits = f.fits_sshort_p(); ASSERT_ALWAYS (! fits);
@@ -291,7 +293,7 @@ check_mpf (void)
 
   // mpf_class::fits_ushort_p
   {
-    bool       fits;
+    int        fits;
     mpf_class  f (0, 2*8*sizeof(short));
     f = 0;         fits = f.fits_ushort_p(); ASSERT_ALWAYS (fits);
     f--;           fits = f.fits_ushort_p(); ASSERT_ALWAYS (! fits);
@@ -370,18 +372,8 @@ check_mpf (void)
   }
 }
 
-// std::numeric_limits
-void
-check_limits (void)
-{
-  // Check that the content is not private.
-  ASSERT_ALWAYS ( std::numeric_limits<mpz_class>::is_integer);
-  ASSERT_ALWAYS (!std::numeric_limits<mpf_class>::is_integer);
 
-  // Check that symbols are emitted.
-  ASSERT_ALWAYS (&std::numeric_limits<mpz_class>::is_integer
-	      != &std::numeric_limits<mpq_class>::is_integer);
-}
+
 
 int
 main (void)
@@ -391,7 +383,6 @@ main (void)
   check_mpz();
   check_mpq();
   check_mpf();
-  check_limits();
 
   tests_end();
   return 0;

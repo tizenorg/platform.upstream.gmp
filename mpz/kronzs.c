@@ -1,32 +1,23 @@
 /* mpz_kronecker_si -- mpz+long Kronecker/Jacobi symbol.
 
-Copyright 1999-2002 Free Software Foundation, Inc.
+Copyright 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "gmp.h"
 #include "gmp-impl.h"
@@ -61,7 +52,7 @@ mpz_kronecker_si (mpz_srcptr a, long b)
 #endif
 
   result_bit1 = JACOBI_BSGN_SS_BIT1 (a_size, b);
-  b_limb = ABS_CAST (unsigned long, b);
+  b_limb = (unsigned long) ABS (b);
   a_ptr = PTR(a);
 
   if ((b_limb & 1) == 0)
@@ -70,10 +61,10 @@ mpz_kronecker_si (mpz_srcptr a, long b)
       int        twos;
 
       if (b_limb == 0)
-	return JACOBI_LS0 (a_low, a_size);   /* (a/0) */
+        return JACOBI_LS0 (a_low, a_size);   /* (a/0) */
 
       if (! (a_low & 1))
-	return 0;  /* (even/even)=0 */
+        return 0;  /* (even/even)=0 */
 
       /* (a/2)=(2/a) for a odd */
       count_trailing_zeros (twos, b_limb);
@@ -91,3 +82,5 @@ mpz_kronecker_si (mpz_srcptr a, long b)
   JACOBI_MOD_OR_MODEXACT_1_ODD (result_bit1, a_rem, a_ptr, a_size, b_limb);
   return mpn_jacobi_base (a_rem, b_limb, result_bit1);
 }
+
+

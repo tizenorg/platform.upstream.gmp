@@ -1,25 +1,26 @@
 /* Test locale support in C++ functions.
 
-Copyright 2001-2003, 2007 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2003 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include <clocale>
 #include <iostream>
-#include <cstdlib>
 
 #include "gmp.h"
 #include "gmp-impl.h"
@@ -28,9 +29,7 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 using namespace std;
 
 
-extern "C" {
-  char point_string[2];
-}
+char point_string[2];
 
 #if HAVE_STD__LOCALE
 // Like std::numpunct, but with decimal_point coming from point_string[].
@@ -105,7 +104,7 @@ check_input (void)
                   cout << "  point " << point[i] << "\n";
                   cout << "  str   \"" << str << "\"\n";
                   cout << "  localeconv point \""
-                       << GMP_DECIMAL_POINT << "\"\n";
+                       << localeconv()->decimal_point << "\"\n";
                   abort ();
                 }
 
@@ -120,7 +119,7 @@ check_input (void)
                   cout << "  got   " << got << "\n";
                   cout << "  want  " << want << "\n";
                   cout << "  localeconv point \""
-                       << GMP_DECIMAL_POINT << "\"\n";
+                       << localeconv()->decimal_point << "\"\n";
                   abort ();
                 }
             }

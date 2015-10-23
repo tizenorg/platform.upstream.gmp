@@ -1,11 +1,11 @@
 /* Classify numbers as probable primes, primes or composites.
-   With -q return true if the following argument is a (probable) prime.
+   With -q return true if the folowing argument is a (probable) prime.
 
-Copyright 1999, 2000, 2002, 2005, 2012 Free Software Foundation, Inc.
+Copyright 1999, 2000, 2002, 2005 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 3 of the License, or (at your option) any later
+Foundation; either version 2 of the License, or (at your option) any later
 version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -13,10 +13,10 @@ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-this program.  If not, see https://www.gnu.org/licenses/.  */
+this program; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA 02110-1301, USA. */
 
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
 #include "gmp.h"
 
@@ -47,7 +47,7 @@ main (int argc, char **argv)
     {
       if (mpz_set_str (n, argv[2], 0) != 0)
 	print_usage_and_exit ();
-      exit (mpz_probab_prime_p (n, 25) == 0);
+      exit (mpz_probab_prime_p (n, 5) == 0);
     }
 
   for (i = 1; i < argc; i++)
@@ -55,7 +55,7 @@ main (int argc, char **argv)
       int class;
       if (mpz_set_str (n, argv[i], 0) != 0)
 	print_usage_and_exit ();
-      class = mpz_probab_prime_p (n, 25);
+      class = mpz_probab_prime_p (n, 5);
       mpz_out_str (stdout, 10, n);
       if (class == 0)
 	puts (" is composite");

@@ -1,73 +1,69 @@
 /* mpz_mul_2exp -- Multiply a bignum by 2**CNT
 
-Copyright 1991, 1993, 1994, 1996, 2001, 2002, 2012 Free Software Foundation,
-Inc.
+Copyright 1991, 1993, 1994, 1996, 2001, 2002 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "gmp.h"
 #include "gmp-impl.h"
 
 void
-mpz_mul_2exp (mpz_ptr r, mpz_srcptr u, mp_bitcnt_t cnt)
+mpz_mul_2exp (mpz_ptr w, mpz_srcptr u, unsigned long int cnt)
 {
-  mp_size_t un, rn;
+  mp_size_t usize = u->_mp_size;
+  mp_size_t abs_usize = ABS (usize);
+  mp_size_t wsize;
   mp_size_t limb_cnt;
-  mp_ptr rp;
-  mp_srcptr up;
-  mp_limb_t rlimb;
+  mp_ptr wp;
+  mp_limb_t wlimb;
 
-  un = ABSIZ (u);
-  limb_cnt = cnt / GMP_NUMB_BITS;
-  rn = un + limb_cnt;
-
-  if (un == 0)
-    rn = 0;
-  else
+  if (usize == 0)
     {
-      rp = MPZ_REALLOC (r, rn + 1);
-      up = PTR(u);
-
-      cnt %= GMP_NUMB_BITS;
-      if (cnt != 0)
-	{
-	  rlimb = mpn_lshift (rp + limb_cnt, up, un, cnt);
-	  rp[rn] = rlimb;
-	  rn += (rlimb != 0);
-	}
-      else
-	{
-	  MPN_COPY_DECR (rp + limb_cnt, up, un);
-	}
-
-      /* Zero all whole limbs at low end.  Do it here and not before calling
-	 mpn_lshift, not to lose for U == R.  */
-      MPN_ZERO (rp, limb_cnt);
+      w->_mp_size = 0;
+      return;
     }
 
-  SIZ(r) = SIZ(u) >= 0 ? rn : -rn;
+  limb_cnt = cnt / GMP_NUMB_BITS;
+  wsize = abs_usize + limb_cnt + 1;
+  if (w->_mp_alloc < wsize)
+    _mpz_realloc (w, wsize);
+
+  wp = w->_mp_d;
+  wsize = abs_usize + limb_cnt;
+
+  cnt %= GMP_NUMB_BITS;
+  if (cnt != 0)
+    {
+      wlimb = mpn_lshift (wp + limb_cnt, u->_mp_d, abs_usize, cnt);
+      if (wlimb != 0)
+	{
+	  wp[wsize] = wlimb;
+	  wsize++;
+	}
+    }
+  else
+    {
+      MPN_COPY_DECR (wp + limb_cnt, u->_mp_d, abs_usize);
+    }
+
+  /* Zero all whole limbs at low end.  Do it here and not before calling
+     mpn_lshift, not to lose for U == W.  */
+  MPN_ZERO (wp, limb_cnt);
+
+  w->_mp_size = usize >= 0 ? wsize : -wsize;
 }

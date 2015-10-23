@@ -5,67 +5,58 @@ Copyright 1997, 1998, 2000, 2001 Free Software Foundation, Inc.
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "gmp.h"
 #include "gmp-impl.h"
 
 void
-mpq_swap (mpq_ptr u, mpq_ptr v) __GMP_NOTHROW
+mpq_swap (mpq_ptr u, mpq_ptr v)
 {
   mp_ptr up, vp;
   mp_size_t usize, vsize;
   mp_size_t ualloc, valloc;
 
-  ualloc = ALLOC(NUM(u));
-  valloc = ALLOC(NUM(v));
-  ALLOC(NUM(v)) = ualloc;
-  ALLOC(NUM(u)) = valloc;
+  ualloc = u->_mp_num._mp_alloc;
+  valloc = v->_mp_num._mp_alloc;
+  v->_mp_num._mp_alloc = ualloc;
+  u->_mp_num._mp_alloc = valloc;
 
-  usize = SIZ(NUM(u));
-  vsize = SIZ(NUM(v));
-  SIZ(NUM(v)) = usize;
-  SIZ(NUM(u)) = vsize;
+  usize = u->_mp_num._mp_size;
+  vsize = v->_mp_num._mp_size;
+  v->_mp_num._mp_size = usize;
+  u->_mp_num._mp_size = vsize;
 
-  up = PTR(NUM(u));
-  vp = PTR(NUM(v));
-  PTR(NUM(v)) = up;
-  PTR(NUM(u)) = vp;
+  up = u->_mp_num._mp_d;
+  vp = v->_mp_num._mp_d;
+  v->_mp_num._mp_d = up;
+  u->_mp_num._mp_d = vp;
 
 
-  ualloc = ALLOC(DEN(u));
-  valloc = ALLOC(DEN(v));
-  ALLOC(DEN(v)) = ualloc;
-  ALLOC(DEN(u)) = valloc;
+  ualloc = u->_mp_den._mp_alloc;
+  valloc = v->_mp_den._mp_alloc;
+  v->_mp_den._mp_alloc = ualloc;
+  u->_mp_den._mp_alloc = valloc;
 
-  usize = SIZ(DEN(u));
-  vsize = SIZ(DEN(v));
-  SIZ(DEN(v)) = usize;
-  SIZ(DEN(u)) = vsize;
+  usize = u->_mp_den._mp_size;
+  vsize = v->_mp_den._mp_size;
+  v->_mp_den._mp_size = usize;
+  u->_mp_den._mp_size = vsize;
 
-  up = PTR(DEN(u));
-  vp = PTR(DEN(v));
-  PTR(DEN(v)) = up;
-  PTR(DEN(u)) = vp;
+  up = u->_mp_den._mp_d;
+  vp = v->_mp_den._mp_d;
+  v->_mp_den._mp_d = up;
+  u->_mp_den._mp_d = vp;
 }

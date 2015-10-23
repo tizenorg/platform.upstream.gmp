@@ -5,28 +5,19 @@ Copyright 2000, 2001 Free Software Foundation, Inc.
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include <stdio.h>
 #include "gmp.h"
@@ -61,7 +52,7 @@ __gmp_tmp_reentrant_alloc (struct tmp_reentrant_t **markp, size_t size)
 #define P   ((struct tmp_reentrant_t *) p)
 
   total_size = size + HSIZ;
-  p = (char *) (*__gmp_allocate_func) (total_size);
+  p = (*__gmp_allocate_func) (total_size);
   P->size = total_size;
   P->next = *markp;
   *markp = P;
@@ -72,7 +63,7 @@ void
 __gmp_tmp_reentrant_free (struct tmp_reentrant_t *mark)
 {
   struct tmp_reentrant_t  *next;
-
+  
   while (mark != NULL)
     {
       next = mark->next;

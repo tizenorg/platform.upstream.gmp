@@ -2,20 +2,23 @@
 
 Copyright 2001, 2002 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,8 +51,9 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
             got, data[i].want, data[i].size);   \
   } while (0)
 
-typedef mp_limb_t (*mpn_aors_1_t) (mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);
-mpn_aors_1_t fudge (mpn_aors_1_t);
+typedef mp_limb_t (*mpn_aors_1_t)
+     _PROTO ((mp_ptr, mp_srcptr, mp_size_t, mp_limb_t));
+mpn_aors_1_t fudge _PROTO ((mpn_aors_1_t));
 
 
 void
@@ -133,8 +137,6 @@ check_add_1 (void)
 
   mp_limb_t  got[ASIZE];
   mp_limb_t  got_c;
-  /* mpn_sec_add_a_itch(n) <= n */
-  mp_limb_t  scratch[ASIZE];
   int        i;
 
   for (i = 0; i < numberof (data); i++)
@@ -147,16 +149,6 @@ check_add_1 (void)
       got_c = mpn_add_1 (got, got, data[i].size, data[i].n);
       VERIFY ("check_add_1 (in-place)");
 
-      SETUP ();
-      scratch [mpn_sec_add_1_itch(data[i].size)] = MAGIC;
-      got_c = mpn_sec_add_1 (got, data[i].src, data[i].size, data[i].n, scratch);
-      got_c ^= scratch [mpn_sec_add_1_itch(data[i].size)] ^ MAGIC;
-      VERIFY ("check_sec_add_1 (separate)");
-
-      SETUP_INPLACE ();
-      got_c = mpn_sec_add_1 (got, got, data[i].size, data[i].n, scratch);
-      VERIFY ("check_sec_add_1 (in-place)");
-
       if (data[i].n == 1)
         {
           SETUP ();
@@ -166,16 +158,6 @@ check_add_1 (void)
           SETUP_INPLACE ();
           got_c = mpn_add_1 (got, got, data[i].size, CNST_LIMB(1));
           VERIFY ("check_add_1 (in-place, const 1)");
-
-          SETUP ();
-          got_c = mpn_sec_add_1 (got, data[i].src, data[i].size,
-				 CNST_LIMB(1), scratch);
-          VERIFY ("check_sec_add_1 (separate, const 1)");
-
-          SETUP_INPLACE ();
-          got_c = mpn_sec_add_1 (got, got, data[i].size,
-				 CNST_LIMB(1), scratch);
-          VERIFY ("check_sec_add_1 (in-place, const 1)");
         }
 
       /* Same again on functions, not inlines. */
@@ -234,8 +216,6 @@ check_sub_1 (void)
 
   mp_limb_t  got[ASIZE];
   mp_limb_t  got_c;
-  /* mpn_sec_sub_1_itch(n) <= n */
-  mp_limb_t  scratch[ASIZE];
   int        i;
 
   for (i = 0; i < numberof (data); i++)
@@ -248,16 +228,6 @@ check_sub_1 (void)
       got_c = mpn_sub_1 (got, got, data[i].size, data[i].n);
       VERIFY ("check_sub_1 (in-place)");
 
-      SETUP ();
-      scratch [mpn_sec_sub_1_itch(data[i].size)] = MAGIC;
-      got_c = mpn_sec_sub_1 (got, data[i].src, data[i].size, data[i].n, scratch);
-      got_c ^= scratch [mpn_sec_sub_1_itch(data[i].size)] ^ MAGIC;
-      VERIFY ("check_sec_sub_1 (separate)");
-
-      SETUP_INPLACE ();
-      got_c = mpn_sec_sub_1 (got, got, data[i].size, data[i].n, scratch);
-      VERIFY ("check_sec_sub_1 (in-place)");
-
       if (data[i].n == 1)
         {
           SETUP ();
@@ -267,16 +237,6 @@ check_sub_1 (void)
           SETUP_INPLACE ();
           got_c = mpn_sub_1 (got, got, data[i].size, CNST_LIMB(1));
           VERIFY ("check_sub_1 (in-place, const 1)");
-
-          SETUP ();
-          got_c = mpn_sec_sub_1 (got, data[i].src, data[i].size,
-				 CNST_LIMB(1), scratch);
-          VERIFY ("check_sec_sub_1 (separate, const 1)");
-
-          SETUP_INPLACE ();
-          got_c = mpn_sec_sub_1 (got, got, data[i].size,
-				 CNST_LIMB(1), scratch);
-          VERIFY ("check_sec_sub_1 (in-place, const 1)");
         }
 
       /* Same again on functions, not inlines. */

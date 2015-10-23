@@ -2,33 +2,24 @@
 
 # GMP perl module tests
 
-# Copyright 2001-2003 Free Software Foundation, Inc.
+# Copyright 2001, 2002, 2003 Free Software Foundation, Inc.
 #
-#  This file is part of the GNU MP Library.
+# This file is part of the GNU MP Library.
 #
-#  The GNU MP Library is free software; you can redistribute it and/or modify
-#  it under the terms of either:
+# The GNU MP Library is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
 #
-#    * the GNU Lesser General Public License as published by the Free
-#      Software Foundation; either version 3 of the License, or (at your
-#      option) any later version.
+# The GNU MP Library is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+# License for more details.
 #
-#  or
-#
-#    * the GNU General Public License as published by the Free Software
-#      Foundation; either version 2 of the License, or (at your option) any
-#      later version.
-#
-#  or both in parallel, as here.
-#
-#  The GNU MP Library is distributed in the hope that it will be useful, but
-#  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#  for more details.
-#
-#  You should have received copies of the GNU General Public License and the
-#  GNU Lesser General Public License along with the GNU MP Library.  If not,
-#  see https://www.gnu.org/licenses/.
+# You should have received a copy of the GNU Lesser General Public License
+# along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+# the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# MA 02110-1301, USA.
 
 
 # These tests aim to exercise the many possible combinations of operands
@@ -792,7 +783,7 @@ foreach my $i ([  1, 19,  1 ],
     ok (&$fun (mpz($$i[0]), $$i[1]) == $$i[2]);
     ok (&$fun (mpz($$i[0]), mpz($$i[1])) == $$i[2]);
   }
-}
+}	       
 
 #------------------------------------------------------------------------------
 # GMP::Mpz::lcm
@@ -1688,7 +1679,7 @@ ok (floor(mpf(7.5)) == 7.0);
 
 { my $old_prec = get_default_prec();
   set_default_prec(128);
-
+ 
   ok (  mpf_eq (mpz("0x10000000000000001"), mpz("0x10000000000000002"), 1));
   ok (! mpf_eq (mpz("0x11"), mpz("0x12"), 128));
 
@@ -1800,7 +1791,7 @@ ok (trunc(mpf(7.5)) == 7.0);
 { my $r = randstate();
   my $z = mpz_urandomm($r, mpz(3)**100);
   ok (UNIVERSAL::isa($z,"GMP::Mpz")); }
-
+  
 #------------------------------------------------------------------------------
 # GMP::Rand::mpz_urandomb_ui
 
@@ -2111,7 +2102,7 @@ ok (via_printf ("%#X", mpq(15,16))  eq '0XF/0X10');
 
 ok (via_printf ("%*.*f", 10, 3, 1.25) eq '     1.250');
 ok (via_printf ("%*.*f", 10, 3, mpf(1.5))   eq '     1.500');
-
+ 
 #------------------------------------------------------------------------------
 # GMP::sgn
 

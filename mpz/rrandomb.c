@@ -2,50 +2,40 @@
    long runs of consecutive ones and zeros in the binary representation.
    Meant for testing of other MP routines.
 
-Copyright 2000-2002, 2004, 2012 Free Software Foundation, Inc.
+Copyright 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "gmp.h"
 #include "gmp-impl.h"
 
-static void gmp_rrandomb (mp_ptr, gmp_randstate_t, mp_bitcnt_t);
+static void gmp_rrandomb _PROTO ((mp_ptr rp, gmp_randstate_t rstate, unsigned long int nbits));
 
 void
-mpz_rrandomb (mpz_ptr x, gmp_randstate_t rstate, mp_bitcnt_t nbits)
+mpz_rrandomb (mpz_ptr x, gmp_randstate_t rstate, unsigned long int nbits)
 {
   mp_size_t nl;
-  mp_ptr xp;
 
-  nl = BITS_TO_LIMBS (nbits);
+  nl = (nbits + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS;
   if (nbits != 0)
     {
-      xp = MPZ_NEWALLOC (x, nl);
-      gmp_rrandomb (xp, rstate, nbits);
+      MPZ_REALLOC (x, nl);
+      gmp_rrandomb (PTR(x), rstate, nbits);
     }
 
   SIZ(x) = nl;
@@ -61,15 +51,15 @@ mpz_rrandomb (mpz_ptr x, gmp_randstate_t rstate, mp_bitcnt_t nbits)
 #endif
 
 static void
-gmp_rrandomb (mp_ptr rp, gmp_randstate_t rstate, mp_bitcnt_t nbits)
+gmp_rrandomb (mp_ptr rp, gmp_randstate_t rstate, unsigned long int nbits)
 {
-  mp_bitcnt_t bi;
+  unsigned long int bi;
   mp_limb_t ranm;		/* buffer for random bits */
   unsigned cap_chunksize, chunksize;
   mp_size_t i;
 
   /* Set entire result to 111..1  */
-  i = BITS_TO_LIMBS (nbits) - 1;
+  i = (nbits + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS - 1;
   rp[i] = GMP_NUMB_MAX >> (GMP_NUMB_BITS - (nbits % GMP_NUMB_BITS)) % GMP_NUMB_BITS;
   for (i = i - 1; i >= 0; i--)
     rp[i] = GMP_NUMB_MAX;

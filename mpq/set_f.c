@@ -1,32 +1,23 @@
 /* mpq_set_f -- set an mpq from an mpf.
 
-Copyright 2000-2002 Free Software Foundation, Inc.
+Copyright 2000, 2001, 2002 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include "gmp.h"
 #include "gmp-impl.h"
@@ -45,9 +36,9 @@ mpq_set_f (mpq_ptr q, mpf_srcptr f)
   if (fsize == 0)
     {
       /* set q=0 */
-      SIZ(NUM(q)) = 0;
-      SIZ(DEN(q)) = 1;
-      PTR(DEN(q))[0] = 1;
+      q->_mp_num._mp_size = 0;
+      q->_mp_den._mp_size = 1;
+      q->_mp_den._mp_d[0] = 1;
       return;
     }
 
@@ -60,23 +51,26 @@ mpq_set_f (mpq_ptr q, mpf_srcptr f)
       /* radix point is to the right of the limbs, no denominator */
       mp_ptr  num_ptr;
 
-      num_ptr = MPZ_NEWALLOC (mpq_numref (q), fexp);
+      MPZ_REALLOC (mpq_numref (q), fexp);
+      num_ptr = q->_mp_num._mp_d;
       MPN_ZERO (num_ptr, fexp - abs_fsize);
       MPN_COPY (num_ptr + fexp - abs_fsize, fptr, abs_fsize);
 
-      SIZ(NUM(q)) = fsize >= 0 ? fexp : -fexp;
-      SIZ(DEN(q)) = 1;
-      PTR(DEN(q))[0] = 1;
+      q->_mp_num._mp_size = fsize >= 0 ? fexp : -fexp;
+      q->_mp_den._mp_size = 1;
+      q->_mp_den._mp_d[0] = 1;
     }
   else
     {
-      /* radix point is within or to the left of the limbs, use denominator */
+      /* radix point is within or to the left of the limbs, use demominator */
       mp_ptr     num_ptr, den_ptr;
       mp_size_t  den_size;
 
       den_size = abs_fsize - fexp;
-      num_ptr = MPZ_NEWALLOC (mpq_numref (q), abs_fsize);
-      den_ptr = MPZ_NEWALLOC (mpq_denref (q), den_size+1);
+      MPZ_REALLOC (mpq_numref (q), abs_fsize);
+      MPZ_REALLOC (mpq_denref (q), den_size+1);
+      num_ptr = q->_mp_num._mp_d;
+      den_ptr = q->_mp_den._mp_d;
 
       if (flow & 1)
         {
@@ -101,7 +95,7 @@ mpq_set_f (mpq_ptr q, mpf_srcptr f)
           den_ptr[den_size] = GMP_LIMB_HIGHBIT >> (shift-1);
         }
 
-      SIZ(NUM(q)) = fsize >= 0 ? abs_fsize : -abs_fsize;
-      SIZ(DEN(q)) = den_size + 1;
+      q->_mp_num._mp_size = fsize >= 0 ? abs_fsize : -abs_fsize;
+      q->_mp_den._mp_size = den_size + 1;
     }
 }

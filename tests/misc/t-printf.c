@@ -1,21 +1,23 @@
 /* Test gmp_printf and related functions.
 
-Copyright 2001-2003 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2003 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 
 /* Usage: t-printf [-s]
@@ -25,9 +27,14 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
        faulty or strange.  */
 
 
-#include "config.h"	/* needed for the HAVE_, could also move gmp incls */
+#include "config.h"
 
+#if HAVE_STDARG
 #include <stdarg.h>
+#else
+#include <varargs.h>
+#endif
+
 #include <stddef.h>    /* for ptrdiff_t */
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,7 +75,12 @@ FILE  *check_vfprintf_fp;
 
 
 void
+#if HAVE_STDARG
 check_plain (const char *want, const char *fmt_orig, ...)
+#else
+check_plain (va_alist)
+     va_dcl
+#endif
 {
   char        got[MAX_OUTPUT];
   int         got_len, want_len;
@@ -76,35 +88,43 @@ check_plain (const char *want, const char *fmt_orig, ...)
   char        *fmt, *q;
   const char  *p;
   va_list     ap;
+#if HAVE_STDARG
   va_start (ap, fmt_orig);
+#else
+  const char  *want;
+  const char  *fmt_orig;
+  va_start (ap);
+  want = va_arg (ap, const char *);
+  fmt_orig = va_arg (ap, const char *);
+#endif
 
   if (! option_check_printf)
     return;
 
   fmtsize = strlen (fmt_orig) + 1;
-  fmt = (char *) (*__gmp_allocate_func) (fmtsize);
+  fmt = (*__gmp_allocate_func) (fmtsize);
 
   for (p = fmt_orig, q = fmt; *p != '\0'; p++)
     {
       switch (*p) {
       case 'a':
       case 'A':
-	/* The exact value of the exponent isn't guaranteed in glibc, and it
-	   and gmp_printf do slightly different things, so don't compare
-	   directly. */
-	goto done;
+        /* The exact value of the exponent isn't guaranteed in glibc, and it
+           and gmp_printf do slightly different things, so don't compare
+           directly. */
+        goto done;
       case 'F':
-	if (p > fmt_orig && *(p-1) == '.')
-	  goto done;  /* don't test the "all digits" cases */
-	/* discard 'F' type */
-	break;
+        if (p > fmt_orig && *(p-1) == '.')
+          goto done;  /* don't test the "all digits" cases */
+        /* discard 'F' type */
+        break;
       case 'Z':
-	/* transmute */
-	*q++ = 'l';
-	break;
+        /* transmute */
+        *q++ = 'l';
+        break;
       default:
-	*q++ = *p;
-	break;
+        *q++ = *p;
+        break;
       }
     }
   *q = '\0';
@@ -134,7 +154,7 @@ check_vsprintf (const char *want, const char *fmt, va_list ap)
 {
   char  got[MAX_OUTPUT];
   int   got_len, want_len;
-
+  
   want_len = strlen (want);
   got_len = gmp_vsprintf (got, fmt, ap);
 
@@ -194,7 +214,7 @@ check_vsnprintf (const char *want, const char *fmt, va_list ap)
   char    got[MAX_OUTPUT+1];
   int     ret, got_len, want_len;
   size_t  bufsize;
-
+  
   want_len = strlen (want);
 
   bufsize = -1;
@@ -203,9 +223,9 @@ check_vsnprintf (const char *want, const char *fmt, va_list ap)
       /* do 0 to 5, then want-5 to want+5 */
       bufsize++;
       if (bufsize > 5 && bufsize < want_len-5)
-	bufsize = want_len-5;
+        bufsize = want_len-5;
       if (bufsize > want_len + 5)
-	break;
+        break;
       ASSERT_ALWAYS (bufsize+1 <= sizeof (got));
 
       got[bufsize] = '!';
@@ -214,33 +234,33 @@ check_vsnprintf (const char *want, const char *fmt, va_list ap)
       got_len = MIN (MAX(1,bufsize)-1, want_len);
 
       if (got[bufsize] != '!')
-	{
-	  printf ("gmp_vsnprintf overwrote bufsize sentinel\n");
-	  goto error;
-	}
+        {
+          printf ("gmp_vsnprintf overwrote bufsize sentinel\n");
+          goto error;
+        }
 
       if (ret != want_len)
-	{
-	  printf ("gmp_vsnprintf return value wrong\n");
-	  goto error;
-	}
+        {
+          printf ("gmp_vsnprintf return value wrong\n");
+          goto error;
+        }
 
       if (bufsize > 0)
-	{
-	  if (memcmp (got, want, got_len) != 0 || got[got_len] != '\0')
-	    {
-	      printf ("gmp_vsnprintf wrong result string\n");
-	    error:
-	      printf ("  fmt       |%s|\n", fmt);
-	      printf ("  bufsize   %lu\n", (unsigned long) bufsize);
-	      printf ("  got       |%s|\n", got);
-	      printf ("  want      |%.*s|\n", got_len, want);
-	      printf ("  want full |%s|\n", want);
-	      printf ("  ret       %d\n", ret);
-	      printf ("  want_len  %d\n", want_len);
-	      abort ();
-	    }
-	}
+        {
+          if (memcmp (got, want, got_len) != 0 || got[got_len] != '\0')
+            {
+              printf ("gmp_vsnprintf wrong result string\n");
+            error:
+              printf ("  fmt       |%s|\n", fmt);
+              printf ("  bufsize   %u\n", bufsize);
+              printf ("  got       |%s|\n", got);
+              printf ("  want      |%.*s|\n", got_len, want);
+              printf ("  want full |%s|\n", want);
+              printf ("  ret       %d\n", ret);
+              printf ("  want_len  %d\n", want_len);
+              abort ();
+            }
+        }
     }
 }
 
@@ -249,7 +269,7 @@ check_vasprintf (const char *want, const char *fmt, va_list ap)
 {
   char  *got;
   int   got_len, want_len;
-
+  
   want_len = strlen (want);
   got_len = gmp_vasprintf (&got, fmt, ap);
 
@@ -278,7 +298,7 @@ check_obstack_vprintf (const char *want, const char *fmt, va_list ap)
 
   obstack_init (&ob);
   got_len = gmp_obstack_vprintf (&ob, fmt, ap);
-  got = (char *) obstack_base (&ob);
+  got = obstack_base (&ob);
   ob_len = obstack_object_size (&ob);
 
   if (got_len != want_len
@@ -300,10 +320,23 @@ check_obstack_vprintf (const char *want, const char *fmt, va_list ap)
 
 
 void
+#if HAVE_STDARG
 check_one (const char *want, const char *fmt, ...)
+#else
+check_one (va_alist)
+     va_dcl
+#endif
 {
   va_list ap;
+#if HAVE_STDARG
   va_start (ap, fmt);
+#else
+  const char  *want;
+  const char  *fmt;
+  va_start (ap);
+  want = va_arg (ap, const char *);
+  fmt = va_arg (ap, const char *);
+#endif
 
   /* simplest first */
   check_vsprintf (want, fmt, ap);
@@ -396,37 +429,37 @@ check_z (void)
   mp_size_t  nsize, zeros;
 
   mpz_init (z);
-
+  
   for (i = 0; i < numberof (data); i++)
     {
       mpz_set_str_or_abort (z, data[i].z, 0);
 
       /* don't try negatives or forced sign in hex or octal */
       if (mpz_fits_slong_p (z)
-	  && ! (hex_or_octal_p (data[i].fmt)
-		&& (strchr (data[i].fmt, '+') != NULL || mpz_sgn(z) < 0)))
-	{
-	  check_plain (data[i].want, data[i].fmt, mpz_get_si (z));
-	}
-
+          && ! (hex_or_octal_p (data[i].fmt)
+                && (strchr (data[i].fmt, '+') != NULL || mpz_sgn(z) < 0)))
+        {
+          check_plain (data[i].want, data[i].fmt, mpz_get_si (z));
+        }
+          
       check_one (data[i].want, data[i].fmt, z);
 
       /* Same again, with %N and possibly some high zero limbs */
       nfmt = __gmp_allocate_strdup (data[i].fmt);
       for (j = 0; nfmt[j] != '\0'; j++)
-	if (nfmt[j] == 'Z')
-	  nfmt[j] = 'N';
+        if (nfmt[j] == 'Z')
+          nfmt[j] = 'N';
       for (zeros = 0; zeros <= 3; zeros++)
-	{
-	  nsize = ABSIZ(z)+zeros;
-	  MPZ_REALLOC (z, nsize);
-	  nsize = (SIZ(z) >= 0 ? nsize : -nsize);
-	  refmpn_zero (PTR(z)+ABSIZ(z), zeros);
-	  check_one (data[i].want, nfmt, PTR(z), nsize);
-	}
+        {
+          nsize = ABSIZ(z)+zeros;
+          MPZ_REALLOC (z, nsize);
+          nsize = (SIZ(z) >= 0 ? nsize : -nsize);
+          refmpn_zero (PTR(z)+ABSIZ(z), zeros);
+          check_one (data[i].want, nfmt, PTR(z), nsize);
+        }
       __gmp_free_func (nfmt, strlen(nfmt)+1);
     }
-
+      
   mpz_clear (z);
 }
 
@@ -527,13 +560,13 @@ check_q (void)
   mpq_t  q;
 
   mpq_init (q);
-
+  
   for (i = 0; i < numberof (data); i++)
     {
       mpq_set_str_or_abort (q, data[i].q, 0);
       check_one (data[i].want, data[i].fmt, q);
     }
-
+      
   mpq_clear (q);
 }
 
@@ -684,14 +717,14 @@ check_f (void)
   for (i = 0; i < numberof (data); i++)
     {
       if (data[i].f[0] == '0' && data[i].f[1] == 'x')
-	mpf_set_str_or_abort (f, data[i].f, 16);
+        mpf_set_str_or_abort (f, data[i].f, 16);
       else
-	mpf_set_str_or_abort (f, data[i].f, 10);
-
+        mpf_set_str_or_abort (f, data[i].f, 10);
+        
       /* if mpf->double doesn't truncate, then expect same result */
       d = mpf_get_d (f);
       if (mpf_cmp_d (f, d) == 0)
-	check_plain (data[i].want, data[i].fmt, d);
+        check_plain (data[i].want, data[i].fmt, d);
 
       check_one (data[i].want, data[i].fmt, f);
     }
@@ -762,16 +795,16 @@ check_n (void)
   do {                                                  \
     type  x[2];                                         \
     char  fmt[128];                                     \
-							\
+                                                        \
     x[0] = ~ (type) 0;                                  \
     x[1] = ~ (type) 0;                                  \
     sprintf (fmt, "%%d%%%sn%%d", string);               \
     check_one ("123456", fmt, 123, &x[0], 456);         \
-							\
+                                                        \
     /* should write whole of x[0] and none of x[1] */   \
     ASSERT_ALWAYS (x[0] == 3);                          \
     ASSERT_ALWAYS (x[1] == (type) ~ (type) 0);		\
-							\
+                                                        \
   } while (0)
 
   CHECK_N (mp_limb_t, "M");
@@ -806,7 +839,7 @@ check_n (void)
     mpq_t  x[2];
     mpq_init (x[0]);
     mpq_init (x[1]);
-    mpq_set_ui (x[0], 987L, 654L);
+    mpq_set_ui (x[0], -987L, 654L);
     mpq_set_ui (x[1], 4115L, 226L);
     check_one ("123456", "%d%Qn%d", 123, x[0], 456);
     MPQ_CHECK_FORMAT (x[0]);
@@ -821,8 +854,8 @@ check_n (void)
     mpf_t  x[2];
     mpf_init (x[0]);
     mpf_init (x[1]);
-    mpf_set_ui (x[0], 987L);
-    mpf_set_ui (x[1], 654L);
+    mpf_set_ui (x[0], -987L);
+    mpf_set_ui (x[1],  654L);
     check_one ("123456", "%d%Fn%d", 123, x[0], 456);
     MPF_CHECK_FORMAT (x[0]);
     MPF_CHECK_FORMAT (x[1]);
@@ -844,9 +877,9 @@ check_n (void)
     MPN_ZERO (a_want, numberof (a_want));
     for (i = 1; i < numberof (a); i++)
       {
-	check_one ("blah", "bl%Nnah", a, i);
-	a_want[0] = 2;
-	ASSERT_ALWAYS (mpn_cmp (a, a_want, i) == 0);
+        check_one ("blah", "bl%Nnah", a, i);
+        a_want[0] = 2;
+        ASSERT_ALWAYS (mpn_cmp (a, a_want, i) == 0);
       }
   }
 }
@@ -884,32 +917,32 @@ check_misc (void)
   /* from the glibc info docs */
   mpz_set_si (z, 0L);
   check_one ("|    0|0    |   +0|+0   |    0|00000|     |   00|0|",
-	     "|%5Zd|%-5Zd|%+5Zd|%+-5Zd|% 5Zd|%05Zd|%5.0Zd|%5.2Zd|%Zd|",
-	     /**/ z,    z,    z,     z,    z,    z,     z,     z,  z);
+             "|%5Zd|%-5Zd|%+5Zd|%+-5Zd|% 5Zd|%05Zd|%5.0Zd|%5.2Zd|%Zd|",
+             /**/ z,    z,    z,     z,    z,    z,     z,     z,  z);
   mpz_set_si (z, 1L);
   check_one ("|    1|1    |   +1|+1   |    1|00001|    1|   01|1|",
-	     "|%5Zd|%-5Zd|%+5Zd|%+-5Zd|% 5Zd|%05Zd|%5.0Zd|%5.2Zd|%Zd|",
-	     /**/ z,    z,    z,     z,    z,    z,     z,     z,  z);
+             "|%5Zd|%-5Zd|%+5Zd|%+-5Zd|% 5Zd|%05Zd|%5.0Zd|%5.2Zd|%Zd|",
+             /**/ z,    z,    z,     z,    z,    z,     z,     z,  z);
   mpz_set_si (z, -1L);
   check_one ("|   -1|-1   |   -1|-1   |   -1|-0001|   -1|  -01|-1|",
-	     "|%5Zd|%-5Zd|%+5Zd|%+-5Zd|% 5Zd|%05Zd|%5.0Zd|%5.2Zd|%Zd|",
-	     /**/ z,    z,    z,     z,    z,    z,     z,     z,  z);
+             "|%5Zd|%-5Zd|%+5Zd|%+-5Zd|% 5Zd|%05Zd|%5.0Zd|%5.2Zd|%Zd|",
+             /**/ z,    z,    z,     z,    z,    z,     z,     z,  z);
   mpz_set_si (z, 100000L);
   check_one ("|100000|100000|+100000|+100000| 100000|100000|100000|100000|100000|",
-	     "|%5Zd|%-5Zd|%+5Zd|%+-5Zd|% 5Zd|%05Zd|%5.0Zd|%5.2Zd|%Zd|",
-	     /**/ z,    z,    z,     z,    z,    z,     z,     z,  z);
+             "|%5Zd|%-5Zd|%+5Zd|%+-5Zd|% 5Zd|%05Zd|%5.0Zd|%5.2Zd|%Zd|",
+             /**/ z,    z,    z,     z,    z,    z,     z,     z,  z);
   mpz_set_si (z, 0L);
   check_one ("|    0|    0|    0|    0|    0|    0|  00000000|",
-	     "|%5Zo|%5Zx|%5ZX|%#5Zo|%#5Zx|%#5ZX|%#10.8Zx|",
-	     /**/ z,   z,   z,    z,    z,    z,       z);
+             "|%5Zo|%5Zx|%5ZX|%#5Zo|%#5Zx|%#5ZX|%#10.8Zx|",
+             /**/ z,   z,   z,    z,    z,    z,       z);
   mpz_set_si (z, 1L);
   check_one ("|    1|    1|    1|   01|  0x1|  0X1|0x00000001|",
-	     "|%5Zo|%5Zx|%5ZX|%#5Zo|%#5Zx|%#5ZX|%#10.8Zx|",
-	     /**/ z,   z,   z,    z,    z,    z,       z);
+             "|%5Zo|%5Zx|%5ZX|%#5Zo|%#5Zx|%#5ZX|%#10.8Zx|",
+             /**/ z,   z,   z,    z,    z,    z,       z);
   mpz_set_si (z, 100000L);
   check_one ("|303240|186a0|186A0|0303240|0x186a0|0X186A0|0x000186a0|",
-	     "|%5Zo|%5Zx|%5ZX|%#5Zo|%#5Zx|%#5ZX|%#10.8Zx|",
-	     /**/ z,   z,   z,    z,    z,    z,       z);
+             "|%5Zo|%5Zx|%5ZX|%#5Zo|%#5Zx|%#5ZX|%#10.8Zx|",
+             /**/ z,   z,   z,    z,    z,    z,       z);
 
   /* %zd for size_t won't be available on old systems, and running something
      to see if it works might be bad, so only try it on glibc, and only on a

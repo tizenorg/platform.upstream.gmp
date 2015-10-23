@@ -2,20 +2,22 @@
 
 Copyright 2002, 2003 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,8 +52,8 @@ struct {
 int  ncall;
 
 
-void __cyg_profile_func_enter (void *, void *)
-  __attribute__ ((no_instrument_function));
+void __cyg_profile_func_enter __GMP_PROTO ((void *this_fn, void *call_site))
+     __attribute__ ((no_instrument_function));
 
 void
 __cyg_profile_func_enter (void *this_fn, void *call_site)
@@ -74,8 +76,8 @@ __cyg_profile_func_enter (void *this_fn, void *call_site)
   ncall++;
 }
 
-void __cyg_profile_func_exit (void *, void *)
-  __attribute__ ((no_instrument_function));
+void __cyg_profile_func_exit __GMP_PROTO ((void *this_fn, void *call_site))
+     __attribute__ ((no_instrument_function));
 
 void
 __cyg_profile_func_exit  (void *this_fn, void *call_site)
@@ -176,9 +178,9 @@ check (void)
   post ();
 #endif
 
-#if HAVE_NATIVE_mpn_com
-  pre ("mpn_com");
-  mpn_com (wp, xp, size);
+#if HAVE_NATIVE_mpn_com_n
+  pre ("mpn_com_n");
+  mpn_com_n (wp, xp, size);
   post ();
 #endif
 
@@ -216,6 +218,14 @@ check (void)
   xp[0] |= 1;
   notdead += (unsigned long) mpn_gcd_1 (xp, size, CNST_LIMB(123));
   post ();
+
+#if HAVE_NATIVE_mpn_gcd_finda
+  pre ("mpn_gcd_finda");
+  xp[0] |= 1;
+  xp[1] |= 1;
+  notdead += mpn_gcd_finda (xp);
+  post ();
+#endif
 
   pre ("mpn_hamdist");
   notdead += mpn_hamdist (xp, yp, size);

@@ -1,32 +1,23 @@
 /* mpz expression evaluation, simple part
 
-Copyright 2000-2002 Free Software Foundation, Inc.
+Copyright 2000, 2001, 2002 Free Software Foundation, Inc.
 
 This file is part of the GNU MP Library.
 
 The GNU MP Library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 2 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
 The GNU MP Library is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the GNU MP Library.  If not,
-see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include <ctype.h>
 #include <stdio.h>
@@ -97,12 +88,12 @@ e_mpz_clrbit (mpz_ptr w, mpz_srcptr x, unsigned long n)
   mpz_clrbit (w, n);
 }
 
-static const struct mpexpr_operator_t  _mpz_expr_standard_table[] = {
+static __gmp_const struct mpexpr_operator_t  _mpz_expr_standard_table[] = {
 
   { "**",  (mpexpr_fun_t) mpz_pow_ui,
     MPEXPR_TYPE_BINARY_UI | MPEXPR_TYPE_RIGHTASSOC,                  220 },
-
-  { "~",   (mpexpr_fun_t) mpz_com,
+  
+  { "~",   (mpexpr_fun_t) mpz_com, 
     MPEXPR_TYPE_UNARY | MPEXPR_TYPE_PREFIX,                          210 },
   { "!",   (mpexpr_fun_t) e_mpz_sgn,
     MPEXPR_TYPE_LOGICAL_NOT | MPEXPR_TYPE_PREFIX,                    210 },
@@ -152,18 +143,18 @@ static const struct mpexpr_operator_t  _mpz_expr_standard_table[] = {
   { "fib",       (mpexpr_fun_t) mpz_fib_ui,        MPEXPR_TYPE_UNARY_UI      },
   { "fac",       (mpexpr_fun_t) mpz_fac_ui,        MPEXPR_TYPE_UNARY_UI      },
   { "gcd",       (mpexpr_fun_t) mpz_gcd,           MPEXPR_TYPE_BINARY
-						   | MPEXPR_TYPE_PAIRWISE    },
+                                                   | MPEXPR_TYPE_PAIRWISE    },
   { "hamdist",   (mpexpr_fun_t) e_mpz_hamdist,     MPEXPR_TYPE_BINARY        },
   { "invert",    (mpexpr_fun_t) mpz_invert,        MPEXPR_TYPE_BINARY        },
   { "jacobi",    (mpexpr_fun_t) mpz_jacobi,        MPEXPR_TYPE_I_BINARY      },
   { "kronecker", (mpexpr_fun_t) mpz_kronecker,     MPEXPR_TYPE_I_BINARY      },
   { "lcm",       (mpexpr_fun_t) mpz_lcm,           MPEXPR_TYPE_BINARY
-						   | MPEXPR_TYPE_PAIRWISE    },
+                                                   | MPEXPR_TYPE_PAIRWISE    },
   { "lucnum",    (mpexpr_fun_t) mpz_lucnum_ui,     MPEXPR_TYPE_UNARY_UI      },
   { "max",       (mpexpr_fun_t) mpz_cmp,           MPEXPR_TYPE_MAX
-						   | MPEXPR_TYPE_PAIRWISE    },
+                                                   | MPEXPR_TYPE_PAIRWISE    },
   { "min",       (mpexpr_fun_t) mpz_cmp,           MPEXPR_TYPE_MIN
-						   | MPEXPR_TYPE_PAIRWISE    },
+                                                   | MPEXPR_TYPE_PAIRWISE    },
   { "nextprime", (mpexpr_fun_t) mpz_nextprime,     MPEXPR_TYPE_UNARY         },
   { "odd_p",     (mpexpr_fun_t) e_mpz_odd_p,       MPEXPR_TYPE_I_UNARY       },
   { "perfect_power_p", (mpexpr_fun_t)mpz_perfect_power_p, MPEXPR_TYPE_I_UNARY},
@@ -183,17 +174,32 @@ static const struct mpexpr_operator_t  _mpz_expr_standard_table[] = {
 
 /* The table is available globally only through a pointer, so the table size
    can change without breaking binary compatibility. */
-const struct mpexpr_operator_t * const mpz_expr_standard_table
+__gmp_const struct mpexpr_operator_t * __gmp_const mpz_expr_standard_table
 = _mpz_expr_standard_table;
 
 
 int
-mpz_expr (mpz_ptr res, int base, const char *e, ...)
+#if HAVE_STDARG
+mpz_expr (mpz_ptr res, int base, __gmp_const char *e, ...)
+#else
+mpz_expr (va_alist)
+     va_dcl
+#endif
 {
   mpz_srcptr  var[MPEXPR_VARIABLES];
   va_list     ap;
   int         ret;
+#if HAVE_STDARG
   va_start (ap, e);
+#else
+  mpz_ptr           res;
+  int               base;
+  __gmp_const char  *e;
+  va_start (ap);
+  res  = va_arg (ap, mpz_ptr);
+  base = va_arg (ap, int);
+  e    = va_arg (ap, __gmp_const char *);
+#endif
 
   TRACE (printf ("mpz_expr(): base %d, %s\n", base, e));
   ret = mpexpr_va_to_var ((void **) var, ap);
@@ -204,3 +210,4 @@ mpz_expr (mpz_ptr res, int base, const char *e, ...)
 
   return mpz_expr_a (mpz_expr_standard_table, res, base, e, strlen(e), var);
 }
+

@@ -1,28 +1,31 @@
 /*
-Copyright 1996-2002, 2004, 2006-2008 Free Software Foundation, Inc.
+Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free Software Foundation,
+Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
 #include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
-#include "tests/tests.h"
+#include "tests.h"
 
 #ifdef OPERATION_mul_1
 #define func __gmpn_mul_1
@@ -112,17 +115,11 @@ main (int argc, char **argv)
   for (test = 1; test <= ntests; test++)
     {
 #if TIMES == 1 && ! defined (PRINT)
-      if (test % (1 + 0x80000 / (SIZE + 20)) == 0)
+      if (test % (SIZE > 10000 ? 1 : 10000 / SIZE) == 0)
 	{
 	  printf ("\r%u", test);
 	  fflush (stdout);
 	}
-#endif
-
-#ifdef PLAIN_RANDOM
-#define MPN_RANDOM mpn_random
-#else
-#define MPN_RANDOM mpn_random2
 #endif
 
 #ifdef RANDOM
@@ -137,7 +134,7 @@ main (int argc, char **argv)
 #ifdef FIXED_XLIMB
       xlimb = FIXED_XLIMB;
 #else
-      MPN_RANDOM (&xlimb, 1);
+      mpn_random2 (&xlimb, 1);
 #endif
 
 #if TIMES != 1
@@ -152,15 +149,15 @@ main (int argc, char **argv)
       cyc = ((double) t * CLOCK) / (TIMES * size * 1000.0);
       printf (funcname ":    %5ldms (%.3f cycles/limb) [%.2f Gb/s]\n",
 	      t, cyc,
-	      CLOCK/cyc*GMP_LIMB_BITS*GMP_LIMB_BITS/1e9);
+	      CLOCK/cyc*BITS_PER_MP_LIMB*BITS_PER_MP_LIMB/1e9);
 #endif
 
 #ifndef NOCHECK
-      MPN_RANDOM (s1, size);
+      mpn_random2 (s1, size);
 #ifdef ZERO
       memset (rp, 0, size * sizeof *rp);
 #else
-      MPN_RANDOM (rp, size);
+      mpn_random2 (rp, size);
 #endif
 #if defined (PRINT) || defined (XPRINT)
       printf ("xlimb=");
@@ -242,7 +239,7 @@ mpn_print (mp_ptr p, mp_size_t size)
     {
 #ifdef _LONG_LONG_LIMB
       printf ("%0*lX%0*lX", (int) (sizeof(mp_limb_t)),
-	      (unsigned long) (p[i] >> (GMP_LIMB_BITS/2)),
+	      (unsigned long) (p[i] >> (BITS_PER_MP_LIMB/2)),
               (int) (sizeof(mp_limb_t)), (unsigned long) (p[i]));
 #else
       printf ("%0*lX", (int) (2 * sizeof(mp_limb_t)), p[i]);

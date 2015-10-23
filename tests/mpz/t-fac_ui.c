@@ -1,21 +1,23 @@
-/* Exercise mpz_fac_ui and mpz_2fac_ui.
+/* Exercise mpz_fac_ui.
 
-Copyright 2000-2002, 2012 Free Software Foundation, Inc.
+Copyright 2000, 2001, 2002 Free Software Foundation, Inc.
 
-This file is part of the GNU MP Library test suite.
+This file is part of the GNU MP Library.
 
-The GNU MP Library test suite is free software; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
-or (at your option) any later version.
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
 
-The GNU MP Library test suite is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
 
-You should have received a copy of the GNU General Public License along with
-the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,9 +37,9 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 int
 main (int argc, char *argv[])
 {
-  unsigned long  n, m;
-  unsigned long  limit = 2222;
-  mpz_t          df[2], f, r;
+  unsigned long  n;
+  unsigned long  limit = 1500;
+  mpz_t          f, r;
 
   tests_start ();
 
@@ -49,12 +51,10 @@ main (int argc, char *argv[])
   /* for small limb testing */
   limit = MIN (limit, MP_LIMB_T_MAX);
 
-  mpz_init_set_ui (df[0], 1);  /* 0!! = 1 */
-  mpz_init_set_ui (df[1], 1);  /* -1!! = 1 */
   mpz_init_set_ui (f, 1);  /* 0! = 1 */
   mpz_init (r);
 
-  for (n = 0, m = 0; n < limit; n++)
+  for (n = 0; n < limit; n++)
     {
       mpz_fac_ui (r, n);
       MPZ_CHECK_FORMAT (r);
@@ -67,36 +67,9 @@ main (int argc, char *argv[])
           abort ();
         }
 
-      mpz_2fac_ui (r, n);
-      MPZ_CHECK_FORMAT (r);
-
-      if (mpz_cmp (df[m], r) != 0)
-        {
-          printf ("mpz_2fac_ui(%lu) wrong\n", n);
-          printf ("  got  "); mpz_out_str (stdout, 10, r); printf("\n");
-          printf ("  want "); mpz_out_str (stdout, 10, df[m]); printf("\n");
-          abort ();
-        }
-
-      m ^= 1;
-      mpz_mul_ui (df[m], df[m], n+1);  /* (n+1)!! = (n-1)!! * (n+1) */
-      mpz_mul_ui (f, f, n+1);  /* (n+1)! = n! * (n+1) */
+      mpz_mul_ui (f, f, n+1);  /* (n+1)! = n! * n */
     }
 
-  n = 1048573; /* a prime */
-  if (n > MP_LIMB_T_MAX)
-    n = 65521; /* a smaller prime :-) */
-  mpz_fac_ui (f, n - 1);
-  m = mpz_fdiv_ui (f, n);
-  if ( m != n - 1)
-    {
-      printf ("mpz_fac_ui(%lu) wrong\n", n - 1);
-      printf ("  Wilson's theorem not verified: got %lu, expected %lu.\n",m ,n - 1);
-      abort ();
-    }
-
-  mpz_clear (df[0]);
-  mpz_clear (df[1]);
   mpz_clear (f);
   mpz_clear (r);
 

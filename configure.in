@@ -523,6 +523,10 @@ case $host in
     path="cray"
     ;;
 
+  arm64*-*-* | aarch64*-*-*)
+    gcc_cflags_maybe="-mfpu=neon"
+    path="arm64"
+    ;;
 
   arm*-*-*)
     path="arm"

@@ -497,6 +497,11 @@ extern UWtype __MPN(udiv_qrnnd) _PROTO ((UWtype *, UWtype, UWtype, UWtype));
 #endif /* LONGLONG_STANDALONE */
 #endif
 #endif /* __arm__ */
+#if defined (__aarch64__) && W_TYPE_SIZE == 64
+#define count_leading_zeros(count, x)  count_leading_zeros_gcc_clz(count, x)
+#define count_trailing_zeros(count, x)  count_trailing_zeros_gcc_ctz(count, x)
+#define COUNT_LEADING_ZEROS_0 64
+#endif /* __aarch64__ */
 
 #if defined (__clipper__) && W_TYPE_SIZE == 32
 #define umul_ppmm(w1, w0, u, v) \

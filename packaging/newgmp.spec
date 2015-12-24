@@ -1,5 +1,5 @@
 %define keepstatic 1
-Name:           gmp
+Name:           newgmp
 Version:        6.0.0
 Release:        0
 License:        GPL-2.0 and LGPL-3.0+
@@ -8,33 +8,33 @@ Url:            http://gmplib.org/
 Group:          Base/Libraries
 Source:         %{name}-%{version}.tar.bz2
 Source2:        baselibs.conf
-Source1001: 	gmp.manifest
+Source1001: 	newgmp.manifest
 BuildRequires:  gcc-c++
 BuildRequires:  pkg-config
 
 %description
 A library for calculating huge numbers (integer and floating point).
 
-%package -n libgmp
+%package -n libnewgmp
 Summary:        Shared library for the GNU MP Library
 Group:          Base/Libraries
 
-%description -n libgmp
+%description -n libnewgmp
 Shared library for the GNU MP Library.
 
-%package -n libgmpxx
+%package -n libnewgmpxx
 Summary:        C++ bindings for the GNU MP Library
 Group:          Base/Libraries
-Requires:       libgmp = %{version}
+Requires:       libnewgmp = %{version}
 
-%description -n libgmpxx
+%description -n libnewgmpxx
 C++ bindings for the GNU MP Library.
 
 %package devel
 Summary:        Include Files and Libraries for Development with the GNU MP Library
 Group:          Base/Development
-Requires:       libgmp = %{version}
-Requires:       libgmpxx = %{version}
+Requires:       libnewgmp = %{version}
+Requires:       libnewgmpxx = %{version}
 
 %description devel
 These libraries are needed to develop programs which calculate with
@@ -57,25 +57,25 @@ make check
 %install
 %make_install
 
-%post -n libgmp -p /sbin/ldconfig
+%post -n libnewgmp -p /sbin/ldconfig
 
-%post -n libgmpxx -p /sbin/ldconfig
+%post -n libnewgmpxx -p /sbin/ldconfig
 
-%postun -n libgmp -p /sbin/ldconfig
+%postun -n libnewgmp -p /sbin/ldconfig
 
-%postun -n libgmpxx -p /sbin/ldconfig
+%postun -n libnewgmpxx -p /sbin/ldconfig
 
 %files
 %manifest %{name}.manifest
 %license COPYINGv2
 %doc AUTHORS README NEWS
 
-%files -n libgmp
+%files -n libnewgmp
 %manifest %{name}.manifest
 %defattr(-,root,root)
 %{_libdir}/libgmp.so.10*
 
-%files -n libgmpxx
+%files -n libnewgmpxx
 %manifest %{name}.manifest
 %defattr(-,root,root)
 %{_libdir}/libgmpxx.so.4*
